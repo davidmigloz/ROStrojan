@@ -10,18 +10,24 @@
 
 #include <unistd.h>  //To include some functionalities specified in POSIX
 #include <stdlib.h>
+#include <pwd.h>
+#include <string.h>
 
-
-char* ver_usuarioActual();
+int ver_usuarioActual(char* username, int length);
 int ver_equipo(char* hostname, int length);
 
 /**
  * ver_usuarioActual: function that returns a pointer to a string containing the user name of the caller.
- * Do not use this function in segure or critical programs as is easily deceivable.
  * @return pointer to a string
  */
-char* ver_usuarioActual() {
-    return getlogin();
+int ver_usuarioActual(char* username, int length) {
+    struct passwd *pwd;
+    int len;
+    pwd = getpwuid(getuid());
+    len = sizeof(pwd->pw_name);
+    if(len>length){exit(1);}
+    memcpy(username, pwd->pw_name, length);
+    return 0;
 }
 
 /**
