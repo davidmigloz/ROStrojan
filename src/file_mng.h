@@ -12,6 +12,8 @@ int _iterate_dir(const char *dirPath, int depth);
 
 void _get_new_path(const char *dirPath, char *dirName, char *newDirPath);
 
+int _find_file(const char *currDir, const char *fileName);
+
 #endif //ROSTROJAN_FILE_MNG_H
 
 #include <stdlib.h>
@@ -81,4 +83,37 @@ void _get_new_path(const char *dirPath, char *dirName, char *newDirPath) {
     strcpy(newDirPath, dirPath);
     strcat(newDirPath, "/");
     strcat(newDirPath, dirName);
+}
+
+
+
+int buscar_archivo(const char *dirPath, const char *fileName){
+    return _find_file(dirPath,fileName);
+}
+
+int _find_file(const char *currDir, const char *fileName){
+    DIR *dir = opendir(currDir);
+    struct dirent *itdir;
+    char newDir[PATH_MAX];
+    char *dirName;
+
+    if(dir){
+        while((itdir = readdir(dir))!=NULL){
+            if(itdir->d_type==DT_DIR && strcmp(itdir->d_name, ".") != 0 && strcmp(itdir->d_name, "..") != 0){
+                _get_new_path(currDir,itdir->d_name,newDir);
+                _find_file(newDir ,fileName);
+            } else {
+                if(itdir->d_type==DT_REG && strcmp(itdir->d_name, fileName)==0){
+                    _get_new_path(currDir,itdir->d_name,newDir);
+                    _print_entry(newDir,0);
+                }
+            }
+        }
+        {
+            closedir(dir);
+            return 0;
+        }
+    }
+    perror("Error al abrir directorio");
+    return EXIT_FAILURE;
 }

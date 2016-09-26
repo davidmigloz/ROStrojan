@@ -11,8 +11,8 @@ int main(int argc, char **argv) {
 
 void test_ver_directorio() {
     puts("----------------------------------");
-    puts("| Test_ver_directorio()          |");
+    puts("| Test_buscar_archivo()          |");
     puts("----------------------------------");
 
-    ver_directorio(".");
+    buscar_archivo("/home/jack/Projects", "main.c");
 }
