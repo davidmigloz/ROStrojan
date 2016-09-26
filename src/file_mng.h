@@ -12,7 +12,7 @@ int _iterate_dir(const char *dirPath, int depth);
 
 void _get_new_path(const char *dirPath, char *dirName, char *newDirPath);
 
-int _find_file(const char *currDir, const char *fileName);
+int buscar_archivo(const char *currDir, const char *fileName);
 
 #endif //ROSTROJAN_FILE_MNG_H
 
@@ -76,7 +76,7 @@ void _print_entry(char *name, int depth) {
 }
 
 /*
- * Duevuelve el path del directorio pasado.
+ * Devuelve el path del directorio pasado.
  * newDirPath = dirPath + "/" + dirName
  */
 void _get_new_path(const char *dirPath, char *dirName, char *newDirPath) {
@@ -85,13 +85,15 @@ void _get_new_path(const char *dirPath, char *dirName, char *newDirPath) {
     strcat(newDirPath, dirName);
 }
 
-
-
-int buscar_archivo(const char *dirPath, const char *fileName){
-    return _find_file(dirPath,fileName);
-}
-
-int _find_file(const char *currDir, const char *fileName){
+/**
+ * Muestra la ruta hasta el archivo buscado.
+ * Ej: buscar_archivo(".", "README.md");
+ *
+ * @param currDir Puntero al nombre de la ruta (absoluta o relativa)
+ * @param fileName Nombre del archivo con extension incluida
+ * @return EXIT_SUCCESS si ok, EXIT_FAILURE si error
+ */
+int buscar_archivo(const char *currDir, const char *fileName){
     DIR *dir = opendir(currDir);
     struct dirent *itdir;
     char newDir[PATH_MAX];
@@ -101,7 +103,7 @@ int _find_file(const char *currDir, const char *fileName){
         while((itdir = readdir(dir))!=NULL){
             if(itdir->d_type==DT_DIR && strcmp(itdir->d_name, ".") != 0 && strcmp(itdir->d_name, "..") != 0){
                 _get_new_path(currDir,itdir->d_name,newDir);
-                _find_file(newDir ,fileName);
+                buscar_archivo(newDir ,fileName);
             } else {
                 if(itdir->d_type==DT_REG && strcmp(itdir->d_name, fileName)==0){
                     _get_new_path(currDir,itdir->d_name,newDir);
@@ -111,7 +113,7 @@ int _find_file(const char *currDir, const char *fileName){
         }
         {
             closedir(dir);
-            return 0;
+            return EXIT_SUCCESS;
         }
     }
     perror("Error al abrir directorio");
