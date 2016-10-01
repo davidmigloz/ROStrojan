@@ -18,6 +18,8 @@ int buscar_archivo(const char *currDir, const char *fileName);
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <string.h>
 #include <dirent.h>
 
@@ -94,12 +96,15 @@ void _get_new_path(const char *dirPath, char *dirName, char *newDirPath) {
  * @return EXIT_SUCCESS si ok, EXIT_FAILURE si error
  */
 int buscar_archivo(const char *currDir, const char *fileName){
+    //Abrir el directorio
     DIR *dir = opendir(currDir);
     struct dirent *itdir;
     char newDir[PATH_MAX];
-
+    //Si se ha podido
     if(dir){
+        //Lee las entradas internas
         while((itdir = readdir(dir))!=NULL){
+            //Si son directorios menos . y .. recursividad, si no comprueba si el nombre coincide
             if(itdir->d_type==DT_DIR && strcmp(itdir->d_name, ".") != 0 && strcmp(itdir->d_name, "..") != 0){
                 _get_new_path(currDir,itdir->d_name,newDir);
                 buscar_archivo(newDir ,fileName);
@@ -117,4 +122,45 @@ int buscar_archivo(const char *currDir, const char *fileName){
     }
     perror("Error al abrir directorio");
     return EXIT_FAILURE;
+}
+
+
+
+
+/**
+ *
+ *
+ */
+
+int bloqueo(int fd, char rw){
+    struct flock lock;
+    off_t file_lenght;
+
+    file_lenght = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0 , SEEK_SET);
+
+    lock.l_whence = SEEK_SET;
+    lock.l_start = 0;
+    lock.l_len = file_lenght;
+    if (rw == 'r'){
+        lock.l_type = F_RDLCK;
+    }else{
+        if (rw== 'w') {
+            lock.l_type = F_WRLCK;
+        }else{
+            perror("Segundo parametro incorrecto.");
+            return EXIT_FAILURE;
+        }
+    }
+    if(!fcntl(fd,F_SETLKW, &lock)){
+        return EXIT_SUCCESS;
+    }
+    perror("No se ha podido establecer el bloqueo; ¿estaba establecido anteriormente?");
+    return EXIT_FAILURE;
+}
+
+
+
+int desbloqueo(int fd){
+    
 }
