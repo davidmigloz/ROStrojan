@@ -163,7 +163,7 @@ int bloqueo(int fd, char rw){
         }
     }
     //ponemos el lock a tod0 el fichero
-    if(!fcntl(fd,F_SETLK, &lock)){
+    if(fcntl(fd,F_SETLK, &lock)!=-1){
         return EXIT_SUCCESS;
     }
     perror("No se ha podido establecer el bloqueo; ¿estaba establecido anteriormente?");
@@ -194,9 +194,9 @@ int desbloqueo(int fd){
     lock.l_type = F_UNLCK;
 
     //ponemos el lock a tod0 el fichero
-    if(fcntl(fd,F_SETLK, &lock)==-1){
-        perror("No se ha podido quitar el bloqueo.");
-        return EXIT_FAILURE;
+    if(fcntl(fd, F_SETLK, &lock)!=-1){
+        return EXIT_SUCCESS;
     }
-    return EXIT_SUCCESS;
+    perror("No se ha podido quitar el bloqueo.");
+    return EXIT_FAILURE;
 }
