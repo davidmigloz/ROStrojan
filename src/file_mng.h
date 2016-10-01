@@ -126,12 +126,12 @@ int buscar_archivo(const char *currDir, const char *fileName){
 
 
 
-
 /**
- *
- *
+ * Bloquea el archivo pasado como fd y según lo que ponga en rw lo bloquea como lectura o escritura
+ * @param fd archivo
+ * @param rw 'r' o 'w' segun sea lectura o escritura
+ * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-
 int bloqueo(int fd, char rw){
     //lock y longitud del lock (tod0 el fichero)
     struct flock lock;
@@ -147,6 +147,8 @@ int bloqueo(int fd, char rw){
     lock.l_whence = SEEK_SET;
     lock.l_start = 0;
     lock.l_len = file_lenght;
+
+
     //si nos han pedido lectura
     if (rw == 'r'){
         lock.l_type = F_RDLCK;
@@ -161,7 +163,7 @@ int bloqueo(int fd, char rw){
         }
     }
     //ponemos el lock a tod0 el fichero
-    if(!fcntl(fd,F_SETLKW, &lock)){
+    if(!fcntl(fd,F_SETLK, &lock)){
         return EXIT_SUCCESS;
     }
     perror("No se ha podido establecer el bloqueo; ¿estaba establecido anteriormente?");
@@ -169,7 +171,11 @@ int bloqueo(int fd, char rw){
 }
 
 
-
+/**
+ * Desbloquea el archivo bloqueado por este mismo programa
+ * @param fd archivo
+ * @return EXIT_FAILURE o EXIT_SUCCESS
+ */
 int desbloqueo(int fd){
     //lock y longitud del lock (tod0 el fichero)
     struct flock lock;
@@ -188,9 +194,9 @@ int desbloqueo(int fd){
     lock.l_type = F_UNLCK;
 
     //ponemos el lock a tod0 el fichero
-    if(!fcntl(fd,F_SETLKW, &lock)){
-        return EXIT_SUCCESS;
+    if(fcntl(fd,F_SETLK, &lock)==-1){
+        perror("No se ha podido quitar el bloqueo.");
+        return EXIT_FAILURE;
     }
-    perror("No se ha podido quitar el bloqueo.");
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }

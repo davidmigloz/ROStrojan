@@ -4,15 +4,14 @@
 void test_ver_directorio() ;
 
 int main(int argc, char **argv) {
-    test_ver_directorio();
-
+    int fd = open("/home/jack/Projects/ROStrojan/src/algo",O_WRONLY);
+    if (fd<0)
+        exit(EXIT_FAILURE);
+    int i = bloqueo(fd, 'w');
+    bloqueo(fd, 'r');
+    if(i==EXIT_SUCCESS)
+        desbloqueo(fd);
+    close(fd);
     return 0;
 }
 
-void test_ver_directorio() {
-    puts("----------------------------------");
-    puts("| Test_buscar_archivo()          |");
-    puts("----------------------------------");
-
-    buscar_archivo("/home/jack/Projects", "main.c");
-}
