@@ -133,25 +133,34 @@ int buscar_archivo(const char *currDir, const char *fileName){
  */
 
 int bloqueo(int fd, char rw){
+    //lock y longitud del lock (tod0 el fichero)
     struct flock lock;
     off_t file_lenght;
 
+    //Leemos el fichero hasta el final desde el principio
+    lseek(fd, 0 , SEEK_SET);
     file_lenght = lseek(fd, 0, SEEK_END);
+    //Pongo el puntero otra vez en la posicion inicial
     lseek(fd, 0 , SEEK_SET);
 
+    //Bloqueamos el fichero desde la posicion inicial hasta la final
     lock.l_whence = SEEK_SET;
     lock.l_start = 0;
     lock.l_len = file_lenght;
+    //si nos han pedido lectura
     if (rw == 'r'){
         lock.l_type = F_RDLCK;
     }else{
+        //si nos han pedido escritura
         if (rw== 'w') {
             lock.l_type = F_WRLCK;
+        //si hay error
         }else{
             perror("Segundo parametro incorrecto.");
             return EXIT_FAILURE;
         }
     }
+    //ponemos el lock a tod0 el fichero
     if(!fcntl(fd,F_SETLKW, &lock)){
         return EXIT_SUCCESS;
     }
@@ -162,5 +171,26 @@ int bloqueo(int fd, char rw){
 
 
 int desbloqueo(int fd){
-    
+    //lock y longitud del lock (tod0 el fichero)
+    struct flock lock;
+    off_t file_lenght;
+
+    //Leemos el fichero hasta el final desde el principio
+    lseek(fd, 0 , SEEK_SET);
+    file_lenght = lseek(fd, 0, SEEK_END);
+    //Pongo el puntero otra vez en la posicion inicial
+    lseek(fd, 0 , SEEK_SET);
+
+    //Desbloqueamos el fichero desde la posicion inicial hasta la final
+    lock.l_whence = SEEK_SET;
+    lock.l_start = 0;
+    lock.l_len = file_lenght;
+    lock.l_type = F_UNLCK;
+
+    //ponemos el lock a tod0 el fichero
+    if(!fcntl(fd,F_SETLKW, &lock)){
+        return EXIT_SUCCESS;
+    }
+    perror("No se ha podido quitar el bloqueo.");
+    return EXIT_FAILURE;
 }
