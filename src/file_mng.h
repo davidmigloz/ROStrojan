@@ -97,7 +97,6 @@ int buscar_archivo(const char *currDir, const char *fileName){
     DIR *dir = opendir(currDir);
     struct dirent *itdir;
     char newDir[PATH_MAX];
-    char *dirName;
 
     if(dir){
         while((itdir = readdir(dir))!=NULL){
