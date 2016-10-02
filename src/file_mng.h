@@ -204,17 +204,17 @@ int desbloqueo(int fd){
 
 
 /**
- * 
- *
+ * Imprime por pantalla el archivo pasado.
+ * @param file puntero a la ruta, absoluta o relativa.
+ * @return EXIT_FAILURE o EXIT_SUCCESS
  */
 int ver_archivo(char *file){
     int fd;
-    int bytes_read;
+    int bytes_read = 0;
     char buffer[BUFFER_SIZE+1];
     fd = open(file, O_RDONLY);
     if(fd == -1){
         perror("No se ha podido abrir el archivo.");
-        close(fd);
         return EXIT_FAILURE;
     }
     if(bloqueo(fd, 'r')==EXIT_FAILURE){
@@ -222,9 +222,9 @@ int ver_archivo(char *file){
         close(fd);
         return EXIT_FAILURE;
     }
-    while((bytes_read == read(fd, buffer, BUFFER_SIZE))>0){
-        buffer[BUFFER_SIZE+1]='\0';
-        printf(buffer);
+    while((bytes_read = read(fd, buffer, BUFFER_SIZE))>0){
+        buffer[bytes_read]='\0';
+        printf("%s", buffer);
     }
     if(bytes_read==-1){
         perror("Error en la lectura del archivo.");

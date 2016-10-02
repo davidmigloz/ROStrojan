@@ -4,7 +4,8 @@
 void test_ver_directorio() ;
 
 int main(int argc, char **argv) {
-    int fd = open("/home/jack/Projects/ROStrojan/src/algo",O_WRONLY);
+    int i = ver_archivo("/home/jack/Projects/ROStrojan/src/algo");
+    /*int fd = open("/home/jack/Projects/ROStrojan/src/algo",O_WRONLY);
     if (fd==-1)
         exit(EXIT_FAILURE);
     int i = bloqueo(fd, 'w');
@@ -13,7 +14,7 @@ int main(int argc, char **argv) {
     if(i==EXIT_SUCCESS)
         desbloqueo(fd);
     desbloqueo(fd);
-    close(fd);
+    close(fd);*/
     return 0;
 }
 
