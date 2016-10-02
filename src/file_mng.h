@@ -5,6 +5,7 @@
 
 #ifndef ROSTROJAN_FILE_MNG_H
 #define ROSTROJAN_FILE_MNG_H
+#define BUFFER_SIZE 1024
 
 void _print_entry(char *name, int depth);
 
@@ -199,4 +200,37 @@ int desbloqueo(int fd){
     }
     perror("No se ha podido quitar el bloqueo.");
     return EXIT_FAILURE;
+}
+
+
+/**
+ * 
+ *
+ */
+int ver_archivo(char *file){
+    int fd;
+    int bytes_read;
+    char buffer[BUFFER_SIZE+1];
+    fd = open(file, O_RDONLY);
+    if(fd == -1){
+        perror("No se ha podido abrir el archivo.");
+        close(fd);
+        return EXIT_FAILURE;
+    }
+    if(bloqueo(fd, 'r')==EXIT_FAILURE){
+        perror("No se ha podido establecer el bloqueo.");
+        close(fd);
+        return EXIT_FAILURE;
+    }
+    while((bytes_read == read(fd, buffer, BUFFER_SIZE))>0){
+        buffer[BUFFER_SIZE+1]='\0';
+        printf(buffer);
+    }
+    if(bytes_read==-1){
+        perror("Error en la lectura del archivo.");
+        close(fd);
+        return EXIT_FAILURE;
+    }
+    close(fd);
+    return EXIT_SUCCESS;
 }
