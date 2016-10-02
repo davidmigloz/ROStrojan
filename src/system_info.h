@@ -10,6 +10,7 @@
 #define ROSTROJAN_SYSTEM_INFO_H
 
 // INCLUDES
+#include <unistd.h>
 
 #include "file_mng.h"
 
