@@ -25,6 +25,8 @@ void test_ver_sistema();
 
 void test_ver_kernel();
 
+void test_ver_ip();
+
 char *concat_path(const char *s1, const char *s2);
 
 int ls_locks();
@@ -47,6 +49,7 @@ void run_tests() {
     test_ver_equipo();
     test_ver_sistema();
     test_ver_kernel();
+    test_ver_ip();
 }
 
 
@@ -142,6 +145,14 @@ void test_ver_kernel() {
     puts("----------------------------------");
 
     ver_kernel();
+}
+
+void test_ver_ip() {
+    puts("----------------------------------");
+    puts("| Test_ver_ip()                  |");
+    puts("----------------------------------");
+
+    puts(ver_ip());
 }
 
 /////////////////////////

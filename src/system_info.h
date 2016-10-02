@@ -16,15 +16,13 @@
 
 // CONSTANTS
 
-#define H_N_LENGTH 20
-
 // PROTOTYPES
 
 /**
  * Get the current user of the system.
  * @return pointer to a string
  */
-const char * ver_usuario_actual();
+char * ver_usuario_actual();
 
 /**
  * ver_equipo: function that shows the name of the host.
@@ -43,5 +41,11 @@ int ver_sistema();
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
 int ver_kernel();
+
+/**
+ * Devuelve la IP del equipo (host name).
+ * @@param hostname  pointer to a string
+ */
+char* ver_ip();
 
 #endif

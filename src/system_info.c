@@ -9,15 +9,15 @@
 #include "system_info.h"
 
 // PRIVATE HEADERS
-
+char *_ifconfig();
 
 /**
  * Get the current user of the system.
  * @return pointer to a string
  */
-const char * ver_usuario_actual() {
-    const char* user = getenv("USER");
-    return (user != NULL) ? user : "";
+char *ver_usuario_actual() {
+    const char *user = getenv("USER");
+    return (char *) ((user != NULL) ? user : "");
 }
 
 /**
@@ -32,7 +32,7 @@ int ver_equipo() {
  * ver_sistema: function that shows the name of the operating system.
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-int ver_sistema(){
+int ver_sistema() {
     return ver_archivo("/etc/issue");
 }
 
@@ -40,6 +40,20 @@ int ver_sistema(){
  * ver kernel: function that shows the kernel version
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-int ver_kernel(){
+int ver_kernel() {
     return ver_archivo("/proc/version");
+}
+
+/**
+ * Muestra la IP del equipo (host name).
+ * @return pointer to a string
+ */
+char *ver_ip() {
+    FILE *pp = popen("hostname --ip-address", "r");
+    char *line = NULL;
+    char buf[BUFFER_SIZE];
+    if (pp != NULL) {
+        line = fgets(buf, sizeof buf, pp);
+    }
+    return line;
 }
