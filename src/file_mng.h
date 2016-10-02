@@ -1,7 +1,15 @@
-/* file_mnh.h
+/*
+ * ****************************************************************************
+ * file_mnh.h
  *
  * Librería que contiene funciones para la gestión de archivos y directorios.
+ * ****************************************************************************
  */
+
+#ifndef ROSTROJAN_FILE_MNG_H
+#define ROSTROJAN_FILE_MNG_H
+
+// INCLUDES
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,9 +17,13 @@
 #include <fcntl.h>
 #include <string.h>
 #include <dirent.h>
+#include <errno.h>
 
-#ifndef ROSTROJAN_FILE_MNG_H
-#define ROSTROJAN_FILE_MNG_H
+// CONSTANTS
+
+#define BUFFER_SIZE 1024
+
+// PROTOTYPES
 
 /**
  * Muestra el contenido del directorio especificado recursivamente.
@@ -52,7 +64,6 @@ int desbloqueo(int fd);
  * @param file puntero a la ruta, absoluta o relativa.
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-int ver_archivo(char *file);
+int ver_archivo(const char *file);
 
-#endif //ROSTROJAN_FILE_MNG_H
-
+#endif

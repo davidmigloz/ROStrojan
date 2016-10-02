@@ -1,11 +1,21 @@
+/*
+ * ****************************************************************************
+ * File_mng.c
+ *
+ * Librería que contiene funciones para la gestión de archivos y directorios.
+ * ****************************************************************************
+ */
+
 #include "file_mng.h"
 
-#define BUFFER_SIZE 1024
-
-
+// PRIVATE HEADERS
 int _iterate_dir(const char *dirPath, int depth);
-void _get_new_path(const char *dirPath, char *dirName, char *newDirPath);
+
 void _print_entry(char *name, int depth);
+
+void _get_new_path(const char *dirPath, char *dirName, char *newDirPath);
+
+int _printFile(int fd);
 
 /**
  * Muestra el contenido del directorio especificado recursivamente.
@@ -79,35 +89,32 @@ void _get_new_path(const char *dirPath, char *dirName, char *newDirPath) {
  * @param fileName Nombre del archivo con extension incluida
  * @return EXIT_SUCCESS si ok, EXIT_FAILURE si error
  */
-int buscar_archivo(const char *currDir, const char *fileName){
-    //Abrir el directorio
+int buscar_archivo(const char *currDir, const char *fileName) {
+    // Abrir el directorio
     DIR *dir = opendir(currDir);
     struct dirent *itdir;
     char newDir[PATH_MAX];
-    //Si se ha podido
-    if(dir){
-        //Lee las entradas internas
-        while((itdir = readdir(dir))!=NULL){
-            //Si son directorios menos . y .. recursividad, si no comprueba si el nombre coincide
-            if(itdir->d_type==DT_DIR && strcmp(itdir->d_name, ".") != 0 && strcmp(itdir->d_name, "..") != 0){
-                _get_new_path(currDir,itdir->d_name,newDir);
-                buscar_archivo(newDir ,fileName);
+    // Si se ha podido
+    if (dir) {
+        // Lee las entradas internas
+        while ((itdir = readdir(dir)) != NULL) {
+            // Si son directorios menos . y .. -> recursividad. Si no, comprueba si el nombre coincide
+            if (itdir->d_type == DT_DIR && strcmp(itdir->d_name, ".") != 0 && strcmp(itdir->d_name, "..") != 0) {
+                _get_new_path(currDir, itdir->d_name, newDir);
+                buscar_archivo(newDir, fileName);
             } else {
-                if(itdir->d_type==DT_REG && strcmp(itdir->d_name, fileName)==0){
-                    _get_new_path(currDir,itdir->d_name,newDir);
-                    _print_entry(newDir,0);
+                if (itdir->d_type == DT_REG && strcmp(itdir->d_name, fileName) == 0) {
+                    _get_new_path(currDir, itdir->d_name, newDir);
+                    _print_entry(newDir, 0);
                 }
             }
         }
-        {
-            closedir(dir);
-            return EXIT_SUCCESS;
-        }
+        closedir(dir);
+        return EXIT_SUCCESS;
     }
     perror("Error al abrir directorio");
     return EXIT_FAILURE;
 }
-
 
 
 /**
@@ -116,73 +123,60 @@ int buscar_archivo(const char *currDir, const char *fileName){
  * @param rw 'r' o 'w' segun sea lectura o escritura
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-int bloqueo(int fd, char rw){
-    //lock y longitud del lock (tod0 el fichero)
+int bloqueo(int fd, char rw) {
     struct flock lock;
-    off_t file_lenght;
 
-    //Leemos el fichero hasta el final desde el principio
-    lseek(fd, 0 , SEEK_SET);
-    file_lenght = lseek(fd, 0, SEEK_END);
-    //Pongo el puntero otra vez en la posicion inicial
-    lseek(fd, 0 , SEEK_SET);
-
-    //Bloqueamos el fichero desde la posicion inicial hasta la final
-    lock.l_whence = SEEK_SET;
-    lock.l_start = 0;
-    lock.l_len = file_lenght;
-
-
-    //si nos han pedido lectura
-    if (rw == 'r'){
-        lock.l_type = F_RDLCK;
-    }else{
-        //si nos han pedido escritura
-        if (rw== 'w') {
-            lock.l_type = F_WRLCK;
-        //si hay error
-        }else{
+    // Establecer bloqueo solicitado
+    switch (rw) {
+        case 'r':
+            lock.l_type = F_RDLCK; // Read block
+            break;
+        case 'w':
+            lock.l_type = F_WRLCK; // Write block
+            break;
+        default:
             perror("Segundo parametro incorrecto.");
             return EXIT_FAILURE;
-        }
     }
-    //ponemos el lock a tod0 el fichero
-    if(fcntl(fd,F_SETLK, &lock)!=-1){
-        return EXIT_SUCCESS;
+
+    // Resto de opciones del bloquo
+    lock.l_whence = SEEK_SET; // From the beginning
+    lock.l_start = 0;        // From byte 0
+    lock.l_len = 0;        // To EOF (0=EOF)
+    lock.l_pid = getpid(); // our PID
+
+    // Intentar bloquear
+    if (fcntl(fd, F_SETLK, &lock) == -1) {
+        fcntl(fd, F_GETLK, &lock);
+        perror("El archivo está bloqueado por otro proceso.\n");
+        return EXIT_FAILURE;
     }
-    perror("No se ha podido establecer el bloqueo; ¿estaba establecido anteriormente?");
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 
 /**
- * Desbloquea el archivo bloqueado por este mismo programa
+ * Desbloquea el archivo bloqueado por este mismo programa.
  * @param fd archivo
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-int desbloqueo(int fd){
-    //lock y longitud del lock (tod0 el fichero)
+int desbloqueo(int fd) {
     struct flock lock;
-    off_t file_lenght;
 
-    //Leemos el fichero hasta el final desde el principio
-    lseek(fd, 0 , SEEK_SET);
-    file_lenght = lseek(fd, 0, SEEK_END);
-    //Pongo el puntero otra vez en la posicion inicial
-    lseek(fd, 0 , SEEK_SET);
-
-    //Desbloqueamos el fichero desde la posicion inicial hasta la final
-    lock.l_whence = SEEK_SET;
-    lock.l_start = 0;
-    lock.l_len = file_lenght;
+    // Desbloquear el fichero desde la posicion inicial hasta la final
     lock.l_type = F_UNLCK;
+    lock.l_whence = SEEK_SET; // From the beginning
+    lock.l_start = 0;        // From byte 0
+    lock.l_len = 0;        // To EOF (0=EOF)
+    lock.l_pid = getpid(); // our PID
 
-    //ponemos el lock a tod0 el fichero
-    if(fcntl(fd, F_SETLK, &lock)!=-1){
-        return EXIT_SUCCESS;
+    // Intentar bloquear
+    if (fcntl(fd, F_SETLK, &lock) == -1) {
+        fcntl(fd, F_GETLK, &lock);
+        perror("No se ha podido desbloquear.\n");
+        return EXIT_FAILURE;
     }
-    perror("No se ha podido quitar el bloqueo.");
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
 
 
@@ -191,29 +185,45 @@ int desbloqueo(int fd){
  * @param file puntero a la ruta, absoluta o relativa.
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-int ver_archivo(char *file){
+int ver_archivo(const char *file) {
     int fd;
-    int bytes_read = 0;
-    char buffer[BUFFER_SIZE+1];
-    fd = open(file, O_RDONLY);
-    if(fd == -1){
-        perror("No se ha podido abrir el archivo.");
+
+    // Abrir archivo
+    if ((fd = open(file, O_RDONLY)) < 0) {
+        perror("Error en la apertura del archivo\n");
         return EXIT_FAILURE;
     }
-    if(bloqueo(fd, 'r')==EXIT_FAILURE){
+    // Bloquear fichero para lectura
+    if (bloqueo(fd, 'r') == EXIT_FAILURE) {
         perror("No se ha podido establecer el bloqueo.");
         close(fd);
         return EXIT_FAILURE;
     }
-    while((bytes_read = read(fd, buffer, BUFFER_SIZE))>0){
-        buffer[bytes_read]='\0';
-        printf("%s", buffer);
+    // Leer archivo
+    int ok = _printFile(fd);
+    // Liberar bloqueo
+    desbloqueo(fd);
+    // Cerrar archivo
+    close(fd);
+    return ok;
+}
+
+/**
+ * Imprime el contenido de un archivo dado su descriptor.
+ * Este debe estar listo para su lectura (bloqueo requerido).
+ * @param fd descriptor del archivo
+ * @return EXIT_FAILURE o EXIT_SUCCESS
+ */
+int _printFile(int fd) {
+    char buffer[BUFFER_SIZE];
+    ssize_t bytes_read = 0;
+
+    while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0) {
+        puts(buffer);
     }
-    if(bytes_read==-1){
+    if (bytes_read == -1 && errno != 0) {
         perror("Error en la lectura del archivo.");
-        close(fd);
         return EXIT_FAILURE;
     }
-    close(fd);
     return EXIT_SUCCESS;
 }
