@@ -125,6 +125,7 @@ int buscar_archivo(const char *currDir, const char *fileName) {
  */
 int bloqueo(int fd, char rw) {
     struct flock lock;
+    memset (&lock, 0, sizeof(lock));
 
     // Establecer bloqueo solicitado
     switch (rw) {
