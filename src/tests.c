@@ -17,6 +17,8 @@ void test_bloqueo();
 
 void test_ver_archivo();
 
+void test_ver_usuario_actual();
+
 char *concat_path(const char *s1, const char *s2);
 
 int ls_locks();
@@ -29,12 +31,19 @@ void run_tests() {
     struct passwd *pw = getpwuid(getuid());
     const char *homedir = pw->pw_dir;
     testDirPath = concat_path(homedir, "ClionProjects/ROStrojan/test");
-    // Run tests
-    test_ver_directorio();
-    test_buscar_archivo();
-    test_bloqueo();
-    test_ver_archivo();
+    // Test: file_mnh.h
+//    test_ver_directorio();
+//    test_buscar_archivo();
+//    test_bloqueo();
+//    test_ver_archivo();
+    // Test
+    test_ver_usuario_actual();
 }
+
+
+/////////////////////////
+// file_mnh.h tests
+/////////////////////////
 
 void test_ver_directorio() {
     puts("----------------------------------");
@@ -89,6 +98,24 @@ void test_ver_archivo() {
 
     ver_archivo(filePath);
 }
+
+/////////////////////////
+// system_info.h tests
+/////////////////////////
+
+void test_ver_usuario_actual() {
+    puts("----------------------------------");
+    puts("| Test_ver_usuario_actual()      |");
+    puts("----------------------------------");
+
+    puts(ver_usuario_actual());
+}
+
+
+
+/////////////////////////
+// Utils
+/////////////////////////
 
 char *concat_path(const char *s1, const char *s2) {
     char *result = malloc(strlen(s1) + strlen(s2) + 2);

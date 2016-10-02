@@ -17,6 +17,7 @@
 #include <pwd.h>
 
 #include "file_mng.h"
+#include "system_info.h"
 
 // PROTOTYPES
 

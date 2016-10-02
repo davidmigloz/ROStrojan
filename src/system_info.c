@@ -1,13 +1,23 @@
+/*
+ * ****************************************************************************
+ * system_info.h
+ *
+ * Libreria que permite acceder a información del sistema.
+ * ****************************************************************************
+ */
+
 #include "system_info.h"
-#define H_N_LENGTH 20
+
+// PRIVATE HEADERS
 
 
 /**
- * ver_usuarioActual: function that returns a pointer to a string containing the user name of the caller.
+ * Get the current user of the system.
  * @return pointer to a string
  */
-int ver_usuarioActual(char* username, int length) {
-    return 0;
+const char * ver_usuario_actual() {
+    const char* user = getenv("USER");
+    return (user != NULL) ? user : "";
 }
 
 /**

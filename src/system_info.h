@@ -1,20 +1,29 @@
-/**
+/*
+ * ****************************************************************************
  * system_info.h
  *
- * Libreria que haciendo uso de file_mng.h para conseguir informacion del sistema
+ * Libreria que permite acceder a información del sistema.
+ * ****************************************************************************
  */
-
-#include "file_mng.h"
-
 
 #ifndef ROSTROJAN_SYSTEM_INFO_H
 #define ROSTROJAN_SYSTEM_INFO_H
 
+// INCLUDES
+
+#include "file_mng.h"
+
+// CONSTANTS
+
+#define H_N_LENGTH 20
+
+// PROTOTYPES
+
 /**
- * ver_usuarioActual: function that returns a pointer to a string containing the user name of the caller.
+ * Get the current user of the system.
  * @return pointer to a string
  */
-int ver_usuarioActual(char* username, int length);
+const char * ver_usuario_actual();
 
 /**
  * ver_equipo: function that shows the name of the host.
@@ -34,5 +43,4 @@ int ver_sistema();
  */
 int ver_kernel();
 
-#endif //ROSTROJAN_SYSTEM_INFO_H
-
+#endif
