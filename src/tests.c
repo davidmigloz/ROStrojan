@@ -19,6 +19,12 @@ void test_ver_archivo();
 
 void test_ver_usuario_actual();
 
+void test_ver_equipo();
+
+void test_ver_sistema();
+
+void test_ver_kernel();
+
 char *concat_path(const char *s1, const char *s2);
 
 int ls_locks();
@@ -38,6 +44,9 @@ void run_tests() {
 //    test_ver_archivo();
     // Test
     test_ver_usuario_actual();
+    test_ver_equipo();
+    test_ver_sistema();
+    test_ver_kernel();
 }
 
 
@@ -111,7 +120,29 @@ void test_ver_usuario_actual() {
     puts(ver_usuario_actual());
 }
 
+void test_ver_equipo() {
+    puts("----------------------------------");
+    puts("| Test_ver_equipo()              |");
+    puts("----------------------------------");
 
+    ver_equipo();
+}
+
+void test_ver_sistema() {
+    puts("----------------------------------");
+    puts("| Test_ver_sistema()              |");
+    puts("----------------------------------");
+
+    ver_sistema();
+}
+
+void test_ver_kernel() {
+    puts("----------------------------------");
+    puts("| Test_ver_kernel()              |");
+    puts("----------------------------------");
+
+    ver_kernel();
+}
 
 /////////////////////////
 // Utils
