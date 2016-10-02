@@ -17,9 +17,9 @@ void test_bloqueo();
 
 void test_ver_archivo();
 
-char *concatPath(const char *s1, const char *s2);
+char *concat_path(const char *s1, const char *s2);
 
-int lsLocks();
+int ls_locks();
 
 // GLOBAL VAR
 char *testDirPath;
@@ -28,7 +28,7 @@ void run_tests() {
     // Config test dir
     struct passwd *pw = getpwuid(getuid());
     const char *homedir = pw->pw_dir;
-    testDirPath = concatPath(homedir, "ClionProjects/ROStrojan/test");
+    testDirPath = concat_path(homedir, "ClionProjects/ROStrojan/test");
     // Run tests
     test_ver_directorio();
     test_buscar_archivo();
@@ -57,14 +57,14 @@ void test_bloqueo() {
     puts("| Test_bloqueo()                 |");
     puts("----------------------------------");
 
-    char *filePath = concatPath(testDirPath, "lista-barcenas.txt");
+    char *filePath = concat_path(testDirPath, "lista-barcenas.txt");
 
     // Abrir archivo
     int fd1 = open(filePath, O_RDONLY);
     // Bloquear fichero para lectura
     bloqueo(fd1, 'r');
     puts("Bloqueado para lectura. Locks:");
-    if (lsLocks() == 1) {
+    if (ls_locks() == 1) {
         puts("PASS: archivo bloqueado.");
     } else {
         puts("FAIL: archivo no bloqueado.");
@@ -73,7 +73,7 @@ void test_bloqueo() {
     desbloqueo(fd1);
     close(fd1);
     puts("Desbloqueado. Locks:");
-    if (lsLocks() == 0) {
+    if (ls_locks() == 0) {
         puts("PASS: archivo desbloqueado.");
     } else {
         puts("FAIL: archivo no desbloqueado.");
@@ -85,12 +85,12 @@ void test_ver_archivo() {
     puts("| Test_ver_archivo()             |");
     puts("----------------------------------");
 
-    char *filePath = concatPath(testDirPath, "lista-barcenas.txt");
+    char *filePath = concat_path(testDirPath, "lista-barcenas.txt");
 
     ver_archivo(filePath);
 }
 
-char *concatPath(const char *s1, const char *s2) {
+char *concat_path(const char *s1, const char *s2) {
     char *result = malloc(strlen(s1) + strlen(s2) + 2);
     strcpy(result, s1);
     strcat(result, "/");
@@ -101,7 +101,7 @@ char *concatPath(const char *s1, const char *s2) {
 /**
  * Run "lslocks | grep ROStrojan" command.
  */
-int lsLocks() {
+int ls_locks() {
     FILE *pp;
     int n_locks = 0;
     pp = popen("lslocks", "r");

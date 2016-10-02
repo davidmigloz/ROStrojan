@@ -15,7 +15,7 @@ void _print_entry(char *name, int depth);
 
 void _get_new_path(const char *dirPath, char *dirName, char *newDirPath);
 
-int _printFile(int fd);
+int _print_file(int fd);
 
 /**
  * Muestra el contenido del directorio especificado recursivamente.
@@ -201,7 +201,7 @@ int ver_archivo(const char *file) {
         return EXIT_FAILURE;
     }
     // Leer archivo
-    int ok = _printFile(fd);
+    int ok = _print_file(fd);
     // Liberar bloqueo
     desbloqueo(fd);
     // Cerrar archivo
@@ -215,12 +215,13 @@ int ver_archivo(const char *file) {
  * @param fd descriptor del archivo
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-int _printFile(int fd) {
+int _print_file(int fd) {
     char buffer[BUFFER_SIZE];
     ssize_t bytes_read = 0;
 
     while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0) {
-        puts(buffer);
+        buffer[bytes_read]='\0';
+        printf("%s", buffer);
     }
     if (bytes_read == -1 && errno != 0) {
         perror("Error en la lectura del archivo.");
