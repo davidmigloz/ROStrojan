@@ -123,16 +123,16 @@ int buscar_archivo(const char *currDir, const char *fileName) {
  * @param rw 'r' o 'w' segun sea lectura o escritura
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-int bloqueo(int fd, char rw) {
+int bloqueo(int fd, int mode) {
     struct flock lock;
     memset (&lock, 0, sizeof(lock));
 
     // Establecer bloqueo solicitado
-    switch (rw) {
-        case 'r':
+    switch (mode) {
+        case OF_READ:
             lock.l_type = F_RDLCK; // Read block
             break;
-        case 'w':
+        case OF_WRITE:
             lock.l_type = F_WRLCK; // Write block
             break;
         default:
@@ -187,33 +187,22 @@ int desbloqueo(int fd) {
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
 int ver_archivo(const char *file) {
-    int fd;
-
-    // Abrir archivo
-    if ((fd = open(file, O_RDONLY)) < 0) {
-        perror("Error en la apertura del archivo\n");
-        return EXIT_FAILURE;
-    }
-    // Bloquear fichero para lectura
-    if (bloqueo(fd, 'r') == EXIT_FAILURE) {
-        perror("No se ha podido establecer el bloqueo.");
-        close(fd);
-        return EXIT_FAILURE;
-    }
-    // Leer archivo
-    int ok = _print_file(fd);
-    // Liberar bloqueo
-    desbloqueo(fd);
-    // Cerrar archivo
-    close(fd);
+    int fd, ok;
+    //abrimos el archivo
+    if((fd = open_file(file, OF_READ))!=EXIT_FAILURE)
+        ok = _print_file(fd);
+    //cerramos el archivo
+    close_file(fd);
+    //devolvemos si ha funcionado la impresion
     return ok;
 }
+
 
 /**
  * Imprime el contenido de un archivo dado su descriptor.
  * Este debe estar listo para su lectura (bloqueo requerido).
- * @param fd descriptor del archivo
- * @return EXIT_FAILURE o EXIT_SUCCESS
+ * @param fd descriptor del archivo.
+ * @return EXIT_FAILURE o EXIT_SUCCESS.
  */
 int _print_file(int fd) {
     char buffer[BUFFER_SIZE];
@@ -228,4 +217,43 @@ int _print_file(int fd) {
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
+}
+
+
+
+/**
+ * Abre un archivo y lo bloquea con el modo elegido.
+ * Los modos permitidos son OF_READ y OF_WRITE por el momento.
+ * Ejemplos de uso: open_file("./Downloads/descarga1.txt", OF_READ);
+ *                  open_file("/home/user/mitexto.txt", OF_WRITE);.
+ * @param file puntero a la cadena de caracteres de la localizacion absoluta o relativa del archivo.
+ * @param mode modo con el que abrir y bloquear: OF_READ o OF_WRITE.
+ * @return El descriptor de archivo del archivo abierto y bloqueado.
+ */
+int open_file(const char* file, int mode){
+    int fd;
+    // Abrir archivo
+    if ((fd = open(file, mode)) < 0) {
+        perror("Error en la apertura del archivo\n");
+        return EXIT_FAILURE;
+    }
+    // Bloquear fichero para lectura
+    if (bloqueo(fd, mode) == EXIT_FAILURE) {
+        perror("No se ha podido establecer el bloqueo.");
+        close(fd);
+        return EXIT_FAILURE;
+    }
+    return fd;
+}
+
+/**
+ * Cierra un archivo despues de desbloquearle.
+ * @param fd Descriptor de archivo.
+ * @return EXIT_FAILURE o EXIT_SUCCESS segun el resultado de cerrar el archivo.
+ */
+int close_file(int fd){
+    // Liberar bloqueo
+    desbloqueo(fd);
+    // Cerrar archivo
+    return close(fd);
 }

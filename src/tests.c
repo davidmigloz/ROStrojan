@@ -83,7 +83,7 @@ void test_bloqueo() {
     // Abrir archivo
     int fd1 = open(filePath, O_RDONLY);
     // Bloquear fichero para lectura
-    bloqueo(fd1, 'r');
+    bloqueo(fd1, OF_READ);
     puts("Bloqueado para lectura. Locks:");
     if (ls_locks() == 1) {
         puts("PASS: archivo bloqueado.");

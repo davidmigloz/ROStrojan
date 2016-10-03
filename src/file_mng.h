@@ -22,6 +22,8 @@
 // CONSTANTS
 
 #define BUFFER_SIZE 1024
+#define OF_READ 00
+#define OF_WRITE 01
 
 // PROTOTYPES
 
@@ -47,10 +49,10 @@ int buscar_archivo(const char *currDir, const char *fileName);
 /**
  * Bloquea el archivo pasado como fd y según lo que ponga en rw lo bloquea como lectura o escritura
  * @param fd archivo
- * @param rw 'r' o 'w' segun sea lectura o escritura
+ * @param mode OF_READ o OF_WRITE segun sea lectura o escritura
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
-int bloqueo(int fd, char rw);
+int bloqueo(int fd, int mode);
 
 /**
  * Desbloquea el archivo bloqueado por este mismo programa
@@ -65,5 +67,23 @@ int desbloqueo(int fd);
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
 int ver_archivo(const char *file);
+
+/**
+ * Abre un archivo y lo bloquea con el modo elegido.
+ * Los modos permitidos son OF_READ y OF_WRITE por el momento.
+ * Ejemplos de uso: open_file("./Downloads/descarga1.txt", OF_READ);
+ *                  open_file("/home/user/mitexto.txt", OF_WRITE);.
+ * @param file puntero a la cadena de caracteres de la localizacion absoluta o relativa del archivo.
+ * @param mode modo con el que abrir y bloquear: OF_READ o OF_WRITE.
+ * @return El descriptor de archivo del archivo abierto y bloqueado.
+ */
+int open_file(const char* file, int mode);
+
+/**
+ * Cierra un archivo despues de desbloquearle.
+ * @param fd Descriptor de archivo.
+ * @return EXIT_FAILURE o EXIT_SUCCESS segun el resultado de cerrar el archivo.
+ */
+int close_file(int fd);
 
 #endif
