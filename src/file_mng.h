@@ -86,4 +86,14 @@ int open_file(const char* file, int mode);
  */
 int close_file(int fd);
 
+/**
+ * Lee una línea y la devuelve en el buffer indicado.
+ * Si la línea es mayor que el buffer la función devuelve -1.
+ * @param fd descriptor del fichero (ya abierto y bloqueado)
+ * @param buffer buffer donde escribir
+ * @param buffer_size tamaño del buffer
+ * @return EXIT_SUCCESS si la línea cabe en el buffer, -1 si no cabe, EXIT_FAILURE si error
+ */
+int read_line(int fd, char* buffer, size_t buffer_size);
+
 #endif

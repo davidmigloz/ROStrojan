@@ -189,8 +189,9 @@ int desbloqueo(int fd) {
 int ver_archivo(const char *file) {
     int fd, ok;
     //abrimos el archivo
-    if((fd = open_file(file, OF_READ))!=EXIT_FAILURE)
+    if ((fd = open_file(file, OF_READ)) != EXIT_FAILURE) {
         ok = _print_file(fd);
+    }
     //cerramos el archivo
     close_file(fd);
     //devolvemos si ha funcionado la impresion
@@ -256,4 +257,30 @@ int close_file(int fd){
     desbloqueo(fd);
     // Cerrar archivo
     return close(fd);
+}
+
+/**
+ * Lee una línea y la devuelve en el buffer indicado.
+ * Si la línea es mayor que el buffer la función devuelve -1.
+ * @param fd descriptor del fichero (ya abierto y bloqueado)
+ * @param buffer buffer donde escribir
+ * @param buffer_size tamaño del buffer
+ * @return EXIT_SUCCESS si la línea cabe en el buffer, -1 si no cabe, EXIT_FAILURE si error
+ */
+int read_line(int fd, char* buffer, size_t buffer_size) {
+    ssize_t bytes_read = 0;
+
+    if ((bytes_read = read(fd, buffer, buffer_size-1)) > 0) {
+        buffer[bytes_read]='\0';
+        for (int i = 0; i < strlen(buffer); i++){
+            if(buffer[i] == '\n' || buffer[i] == EOF) {
+                buffer[i]='\0';
+                return EXIT_SUCCESS;
+            }
+        }
+        return -1; // La línea es mayor que el buffer
+
+    } else {
+        return EXIT_FAILURE;
+    }
 }

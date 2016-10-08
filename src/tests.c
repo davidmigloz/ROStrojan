@@ -17,6 +17,8 @@ void test_bloqueo();
 
 void test_ver_archivo();
 
+void test_read_line();
+
 void test_ver_usuario_actual();
 
 void test_ver_equipo();
@@ -44,12 +46,13 @@ void run_tests() {
 //    test_buscar_archivo();
 //    test_bloqueo();
 //    test_ver_archivo();
+    test_read_line();
     // Test
-    test_ver_usuario_actual();
-    test_ver_equipo();
-    test_ver_sistema();
-    test_ver_kernel();
-    test_ver_ip();
+//    test_ver_usuario_actual();
+//    test_ver_equipo();
+//    test_ver_sistema();
+//    test_ver_kernel();
+//    test_ver_ip();
 }
 
 
@@ -109,6 +112,35 @@ void test_ver_archivo() {
     char *filePath = concat_path(testDirPath, "lista-barcenas.txt");
 
     ver_archivo(filePath);
+}
+
+void test_read_line() {
+    puts("----------------------------------");
+    puts("| Test_read_line()               |");
+    puts("----------------------------------");
+
+    char *filePath = concat_path(testDirPath, "lista-barcenas.txt");
+
+    int fd;
+    // Abrimos el archivo
+    if((fd = open_file(filePath, OF_READ))!= EXIT_FAILURE) {
+        char buffer[BUFFER_SIZE];
+        // Leer 1º línea (corta)
+        int i = read_line(fd, buffer, BUFFER_SIZE);
+        puts(buffer);
+        printf("read_line = %d\n", i);
+        // Leer 2º línea (larga)
+        i = read_line(fd, buffer, BUFFER_SIZE);
+        puts(buffer);
+        printf("read_line = %d\n", i);
+        // Terminar de leer la línea
+        while((i = read_line(fd, buffer, BUFFER_SIZE)) == -1) {
+            puts(buffer);
+        }
+        printf("read_line = %d\n", i);
+    }
+    // Cerramos el archivo
+    close_file(fd);
 }
 
 /////////////////////////
