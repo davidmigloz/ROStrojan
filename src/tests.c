@@ -29,6 +29,8 @@ void test_ver_kernel();
 
 void test_ver_ip();
 
+void test_ver_usuario();
+
 char *concat_path(const char *s1, const char *s2);
 
 int ls_locks();
@@ -198,11 +200,13 @@ void test_ver_usuario() {
     puts("----------------------------------");
     puts("| Test_ver_usuario()             |");
     puts("----------------------------------");
-    char* buffer[3];
-    for(int i=0; i<3; i++)
-        buffer[i] = malloc(sizeof(char)*BUFFER_SIZE);
-    ver_usuario("1000", buffer);
-    printf("Usuario: %s\t\tGrupo: %s\t\tDirectorio: %s", buffer[0], buffer[1], buffer[2]);
+
+    puts("\nTest: usuario inexistente");
+    ver_usuario("hacker2000");
+    puts("\nTest: usuario existente (root)");
+    ver_usuario("root");
+    puts("\nTest: todos los usuarios");
+    ver_usuario(NULL);
 }
 
 

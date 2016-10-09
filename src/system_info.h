@@ -15,6 +15,8 @@
 #include "file_mng.h"
 
 // CONSTANTS
+#define P_GROUP 4
+#define P_HOME_DIR 6
 
 // PROTOTYPES
 
@@ -48,7 +50,10 @@ char *ver_kernel();
  */
 char *ver_ip();
 
-
-
-int ver_usuario(char *uid, char* buffer[3]);
+/**
+ * Imprime el uid, grupo principal y directorio home del usuario pasado,
+ * o de todos los usuarios del sistema si se pasa NULL.
+ * @param uid nombre de usuario
+ */
+void ver_usuario(char* uid);
 #endif
