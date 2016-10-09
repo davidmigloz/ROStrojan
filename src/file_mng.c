@@ -180,47 +180,6 @@ int desbloqueo(int fd) {
     return EXIT_SUCCESS;
 }
 
-
-/**
- * Imprime por pantalla el archivo pasado.
- * @param file puntero a la ruta, absoluta o relativa.
- * @return EXIT_FAILURE o EXIT_SUCCESS
- */
-int ver_archivo(const char *file) {
-    int fd, ok;
-    //abrimos el archivo
-    if ((fd = open_file(file, OF_READ)) != EXIT_FAILURE) {
-        ok = _print_file(fd);
-    }
-    //cerramos el archivo
-    close_file(fd);
-    //devolvemos si ha funcionado la impresion
-    return ok;
-}
-
-
-/**
- * Imprime el contenido de un archivo dado su descriptor.
- * Este debe estar listo para su lectura (bloqueo requerido).
- * @param fd descriptor del archivo.
- * @return EXIT_FAILURE o EXIT_SUCCESS.
- */
-int _print_file(int fd) {
-    char buffer[BUFFER_SIZE];
-    ssize_t bytes_read = 0;
-
-    while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0) {
-        buffer[bytes_read] = '\0';
-        printf("%s", buffer);
-    }
-    if (bytes_read == -1 && errno != 0) {
-        perror("Error en la lectura del archivo.");
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-}
-
-
 /**
  * Abre un archivo y lo bloquea con el modo elegido.
  * Los modos permitidos son OF_READ y OF_WRITE por el momento.
@@ -260,30 +219,69 @@ int close_file(int fd) {
 
 /**
  * Lee una línea y la devuelve en el buffer indicado.
- * Si la línea es mayor que el buffer la función devuelve -1.
- * El máximo de bytes que puede leer es (buffer_size-1).
+ * El máximo de bytes que puede leer es (buffer_size-1), el último byte se reserva para \0.
+ * Si la línea es mayor la función devuelve LONG_LINE, si llega al final del archivo devuelve END_OF_FILE.
  * Nota: los caracteres no ASCII ocupan 2 bytes.
  * @param fd descriptor del fichero (ya abierto y bloqueado)
  * @param buffer buffer donde escribir
  * @param buffer_size tamaño del buffer
- * @return EXIT_SUCCESS si la línea cabe en el buffer, -1 si no cabe, EXIT_FAILURE si error
+ * @return EXIT_SUCCESS si línea <  buffer_size,
+ *         LONG_LINE    si línea >= buffer_size,
+ *         END_OF_FILE  si línea <  buffer_size y EOF encontrado,
+ *         EXIT_FAILURE si error
  */
 int read_line(int fd, char *buffer, size_t buffer_size) {
     ssize_t bytes_read = 0;
-
-    if ((bytes_read = read(fd, buffer, buffer_size - 1)) > 0) {
-        for (int i = 0; i < strlen(buffer); i++) {
-            if (buffer[i] == '\n' || buffer[i] == EOF) {
-                buffer[i] = '\0';
-                // Establecer el cursor en el siguiente caracter
+    // Leer archivo
+    if ((bytes_read = read(fd, buffer, buffer_size - 1)) <= 0) {
+        return bytes_read == 0 ? END_OF_FILE : EXIT_FAILURE;
+    }
+    // Buscar fin de línea
+    for (int i = 0; i < strlen(buffer); i++) {
+        if (buffer[i] == '\n') {
+            // Reemplazar \n por \0
+            buffer[i] = '\0';
+            // Comprobar si ha llegado al final del fichero
+            if (bytes_read != buffer_size - 1 && bytes_read == i + 1) {
+                return END_OF_FILE;
+            } else {
+                // Sino, establecer el cursor en el siguiente caracter a \n
                 int pos = (int) (bytes_read - (i + 1));
                 lseek(fd, -pos, SEEK_CUR);
                 return EXIT_SUCCESS;
             }
         }
-        return -1; // La línea es mayor que el buffer
+    }
+    return LONG_LINE;
+}
 
-    } else {
+
+/**
+ * Imprime por pantalla el archivo pasado.
+ * @param file puntero a la ruta, absoluta o relativa.
+ * @return EXIT_FAILURE o EXIT_SUCCESS
+ */
+int ver_archivo(const char *file) {
+    int fd;
+    // Abrimos el archivo
+    if ((fd = open_file(file, OF_READ)) == EXIT_FAILURE) {
         return EXIT_FAILURE;
     }
+    // Leer archivo
+    char buffer[BUFFER_SIZE];
+    int ok;
+    // Iterar sobre las líneas
+    do {
+        // Iterar sobre una línea (si es más larga que BUFFER_SIZE)
+        do {
+            if((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE){
+                return  EXIT_FAILURE;
+            }
+            printf("%s", buffer);
+            fflush(stdout);
+        } while (ok == LONG_LINE);
+        printf("\n");
+    } while (ok != END_OF_FILE);
+    // Cerramos el archivo
+    return close_file(fd);
 }

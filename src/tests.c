@@ -45,8 +45,8 @@ void run_tests() {
 //    test_ver_directorio();
 //    test_buscar_archivo();
 //    test_bloqueo();
-//    test_ver_archivo();
-    test_read_line();
+    test_ver_archivo();
+//    test_read_line();
     // Test
 //    test_ver_usuario_actual();
 //    test_ver_equipo();
@@ -139,7 +139,7 @@ void test_read_line() {
             i = read_line(fd, buffer, BUFFER_SIZE);
             printf("%s", buffer);
             numLecturas++;
-        } while(i == -1);
+        } while(i == LONG_LINE);
         printf("\n");
         (numLecturas == 2 ? puts("PASS") : puts("FAIL"));
     }

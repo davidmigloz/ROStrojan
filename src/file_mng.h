@@ -24,6 +24,8 @@
 #define BUFFER_SIZE 1024
 #define OF_READ 00
 #define OF_WRITE 01
+#define LONG_LINE -1
+#define END_OF_FILE -2
 
 // PROTOTYPES
 
@@ -62,13 +64,6 @@ int bloqueo(int fd, int mode);
 int desbloqueo(int fd);
 
 /**
- * Imprime por pantalla el archivo pasado.
- * @param file puntero a la ruta, absoluta o relativa.
- * @return EXIT_FAILURE o EXIT_SUCCESS
- */
-int ver_archivo(const char *file);
-
-/**
  * Abre un archivo y lo bloquea con el modo elegido.
  * Los modos permitidos son OF_READ y OF_WRITE por el momento.
  * Ejemplos de uso: open_file("./Downloads/descarga1.txt", OF_READ);
@@ -88,12 +83,24 @@ int close_file(int fd);
 
 /**
  * Lee una línea y la devuelve en el buffer indicado.
- * Si la línea es mayor que el buffer la función devuelve -1.
+ * El máximo de bytes que puede leer es (buffer_size-1), el último byte se reserva para \0.
+ * Si la línea es mayor la función devuelve LONG_LINE, si llega al final del archivo devuelve END_OF_FILE.
+ * Nota: los caracteres no ASCII ocupan 2 bytes.
  * @param fd descriptor del fichero (ya abierto y bloqueado)
  * @param buffer buffer donde escribir
  * @param buffer_size tamaño del buffer
- * @return EXIT_SUCCESS si la línea cabe en el buffer, -1 si no cabe, EXIT_FAILURE si error
+ * @return EXIT_SUCCESS si línea <  buffer_size,
+ *         LONG_LINE    si línea >= buffer_size,
+ *         END_OF_FILE  si línea <  buffer_size y EOF encontrado,
+ *         EXIT_FAILURE si error
  */
 int read_line(int fd, char* buffer, size_t buffer_size);
+
+/**
+ * Imprime por pantalla el archivo pasado.
+ * @param file puntero a la ruta, absoluta o relativa.
+ * @return EXIT_FAILURE o EXIT_SUCCESS
+ */
+int ver_archivo(const char *file);
 
 #endif
