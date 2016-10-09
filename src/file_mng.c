@@ -125,7 +125,7 @@ int buscar_archivo(const char *currDir, const char *fileName) {
  */
 int bloqueo(int fd, int mode) {
     struct flock lock;
-    memset (&lock, 0, sizeof(lock));
+    memset(&lock, 0, sizeof(lock));
 
     // Establecer bloqueo solicitado
     switch (mode) {
@@ -210,7 +210,7 @@ int _print_file(int fd) {
     ssize_t bytes_read = 0;
 
     while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0) {
-        buffer[bytes_read]='\0';
+        buffer[bytes_read] = '\0';
         printf("%s", buffer);
     }
     if (bytes_read == -1 && errno != 0) {
@@ -219,7 +219,6 @@ int _print_file(int fd) {
     }
     return EXIT_SUCCESS;
 }
-
 
 
 /**
@@ -231,7 +230,7 @@ int _print_file(int fd) {
  * @param mode modo con el que abrir y bloquear: OF_READ o OF_WRITE.
  * @return El descriptor de archivo del archivo abierto y bloqueado.
  */
-int open_file(const char* file, int mode){
+int open_file(const char *file, int mode) {
     int fd;
     // Abrir archivo
     if ((fd = open(file, mode)) < 0) {
@@ -252,7 +251,7 @@ int open_file(const char* file, int mode){
  * @param fd Descriptor de archivo.
  * @return EXIT_FAILURE o EXIT_SUCCESS segun el resultado de cerrar el archivo.
  */
-int close_file(int fd){
+int close_file(int fd) {
     // Liberar bloqueo
     desbloqueo(fd);
     // Cerrar archivo
@@ -262,19 +261,23 @@ int close_file(int fd){
 /**
  * Lee una línea y la devuelve en el buffer indicado.
  * Si la línea es mayor que el buffer la función devuelve -1.
+ * El máximo de bytes que puede leer es (buffer_size-1).
+ * Nota: los caracteres no ASCII ocupan 2 bytes.
  * @param fd descriptor del fichero (ya abierto y bloqueado)
  * @param buffer buffer donde escribir
  * @param buffer_size tamaño del buffer
  * @return EXIT_SUCCESS si la línea cabe en el buffer, -1 si no cabe, EXIT_FAILURE si error
  */
-int read_line(int fd, char* buffer, size_t buffer_size) {
+int read_line(int fd, char *buffer, size_t buffer_size) {
     ssize_t bytes_read = 0;
 
-    if ((bytes_read = read(fd, buffer, buffer_size-1)) > 0) {
-        buffer[bytes_read]='\0';
-        for (int i = 0; i < strlen(buffer); i++){
-            if(buffer[i] == '\n' || buffer[i] == EOF) {
-                buffer[i]='\0';
+    if ((bytes_read = read(fd, buffer, buffer_size - 1)) > 0) {
+        for (int i = 0; i < strlen(buffer); i++) {
+            if (buffer[i] == '\n' || buffer[i] == EOF) {
+                buffer[i] = '\0';
+                // Establecer el cursor en el siguiente caracter
+                int pos = (int) (bytes_read - (i + 1));
+                lseek(fd, -pos, SEEK_CUR);
                 return EXIT_SUCCESS;
             }
         }

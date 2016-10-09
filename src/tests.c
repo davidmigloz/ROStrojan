@@ -125,19 +125,23 @@ void test_read_line() {
     // Abrimos el archivo
     if((fd = open_file(filePath, OF_READ))!= EXIT_FAILURE) {
         char buffer[BUFFER_SIZE];
-        // Leer 1º línea (corta)
+        // Línea < buffer-1
         int i = read_line(fd, buffer, BUFFER_SIZE);
         puts(buffer);
-        printf("read_line = %d\n", i);
-        // Leer 2º línea (larga)
+        (i == 0 ? puts("PASS") : puts("FAIL"));
+        // Línea == buffer-1
         i = read_line(fd, buffer, BUFFER_SIZE);
         puts(buffer);
-        printf("read_line = %d\n", i);
-        // Terminar de leer la línea
-        while((i = read_line(fd, buffer, BUFFER_SIZE)) == -1) {
-            puts(buffer);
-        }
-        printf("read_line = %d\n", i);
+        (i == 0 ? puts("PASS") : puts("FAIL"));
+        // Línea > buffer-1
+        int numLecturas = 0;
+        do{
+            i = read_line(fd, buffer, BUFFER_SIZE);
+            printf("%s", buffer);
+            numLecturas++;
+        } while(i == -1);
+        printf("\n");
+        (numLecturas == 2 ? puts("PASS") : puts("FAIL"));
     }
     // Cerramos el archivo
     close_file(fd);
