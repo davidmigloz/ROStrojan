@@ -45,13 +45,13 @@ void run_tests() {
 //    test_ver_directorio();
 //    test_buscar_archivo();
 //    test_bloqueo();
-    test_ver_archivo();
+//    test_ver_archivo();
 //    test_read_line();
     // Test
 //    test_ver_usuario_actual();
 //    test_ver_equipo();
 //    test_ver_sistema();
-//    test_ver_kernel();
+    test_ver_kernel();
 //    test_ver_ip();
 }
 
@@ -123,7 +123,7 @@ void test_read_line() {
 
     int fd;
     // Abrimos el archivo
-    if((fd = open_file(filePath, OF_READ))!= EXIT_FAILURE) {
+    if ((fd = open_file(filePath, OF_READ)) != EXIT_FAILURE) {
         char buffer[BUFFER_SIZE];
         // Línea < buffer-1
         int i = read_line(fd, buffer, BUFFER_SIZE);
@@ -135,11 +135,11 @@ void test_read_line() {
         (i == 0 ? puts("PASS") : puts("FAIL"));
         // Línea > buffer-1
         int numLecturas = 0;
-        do{
+        do {
             i = read_line(fd, buffer, BUFFER_SIZE);
             printf("%s", buffer);
             numLecturas++;
-        } while(i == LONG_LINE);
+        } while (i == LONG_LINE);
         printf("\n");
         (numLecturas == 2 ? puts("PASS") : puts("FAIL"));
     }
@@ -164,7 +164,7 @@ void test_ver_equipo() {
     puts("| Test_ver_equipo()              |");
     puts("----------------------------------");
 
-    ver_equipo();
+    puts(ver_equipo());
 }
 
 void test_ver_sistema() {
@@ -172,7 +172,7 @@ void test_ver_sistema() {
     puts("| Test_ver_sistema()              |");
     puts("----------------------------------");
 
-    ver_sistema();
+    puts(ver_sistema());
 }
 
 void test_ver_kernel() {
@@ -180,7 +180,7 @@ void test_ver_kernel() {
     puts("| Test_ver_kernel()              |");
     puts("----------------------------------");
 
-    ver_kernel();
+    puts(ver_kernel());
 }
 
 void test_ver_ip() {
@@ -204,7 +204,7 @@ char *concat_path(const char *s1, const char *s2) {
 }
 
 /**
- * Run "lslocks | grep ROStrojan" command.
+ * Ejecuta el comando "lslocks | grep ROStrojan".
  */
 int ls_locks() {
     FILE *pp;

@@ -19,33 +19,33 @@
 // PROTOTYPES
 
 /**
- * Get the current user of the system.
- * @return pointer to a string
+ * Obtener el usuario actual del sistema.
+ * @return string con el usuario
  */
-char * ver_usuario_actual();
+char *ver_usuario_actual();
 
 /**
- * ver_equipo: function that shows the name of the host.
- * @return EXIT_FAILURE o EXIT_SUCCESS
+ * Devuelve el nombre del equipo.
+ * @return string con el equipo
  */
-int ver_equipo();
+char *ver_equipo();
 
 /**
- * ver_sistema: function that shows the name of the operating system.
- * @return EXIT_FAILURE o EXIT_SUCCESS
+ * Devuelve el nombre del sistema operativo.
+ * @return string con el so
  */
-int ver_sistema();
+char *ver_sistema();
 
 /**
- * ver kernel: function that shows the kernel version
- * @return EXIT_FAILURE o EXIT_SUCCESS
+ * Devuelve la versión del kernel.
+ * @return string con el kernel
  */
-int ver_kernel();
+char *ver_kernel();
 
 /**
  * Devuelve la IP del equipo (host name).
  * @@param hostname  pointer to a string
  */
-char* ver_ip();
+char *ver_ip();
 
 #endif

@@ -9,11 +9,11 @@
 #include "system_info.h"
 
 // PRIVATE HEADERS
-char *_ifconfig();
+char *_read_one_line_file(char *file, int max_length);
 
 /**
- * Get the current user of the system.
- * @return pointer to a string
+ * Devuelve el usuario actual del sistema.
+ * @return string con el usuario
  */
 char *ver_usuario_actual() {
     const char *user = getenv("USER");
@@ -21,27 +21,33 @@ char *ver_usuario_actual() {
 }
 
 /**
- * ver_equipo: function that shows the name of the host.
- * @return EXIT_FAILURE o EXIT_SUCCESS
+ * Devuelve el nombre del equipo.
+ * @return string con el equipo
  */
-int ver_equipo() {
-    return ver_archivo("/etc/hostname");
+char *ver_equipo() {
+    // Fichero donde se almacena el nombre del equipo
+    char *FILE = "/etc/hostname";
+    return _read_one_line_file(FILE, HOST_NAME_MAX);
 }
 
 /**
- * ver_sistema: function that shows the name of the operating system.
- * @return EXIT_FAILURE o EXIT_SUCCESS
+ * Devuelve el nombre del sistema operativo.
+ * @return string con el so
  */
-int ver_sistema() {
-    return ver_archivo("/etc/issue");
+char *ver_sistema() {
+    // Fichero donde se almacena el nombre del SO
+    char *FILE = "/etc/issue";
+    return _read_one_line_file(FILE, 128);
 }
 
 /**
- * ver kernel: function that shows the kernel version
- * @return EXIT_FAILURE o EXIT_SUCCESS
+ * Devuelve la versión del kernel.
+ * @return string con el kernel
  */
-int ver_kernel() {
-    return ver_archivo("/proc/version");
+char *ver_kernel() {
+    // Fichero donde se almacena el nombre del kernel
+    char *FILE = "/proc/version";
+    return _read_one_line_file(FILE, 1024);
 }
 
 /**
@@ -56,4 +62,29 @@ char *ver_ip() {
         line = fgets(buf, sizeof buf, pp);
     }
     return line;
+}
+
+/**
+ * Lee archivos de una línea devolviendo una cadena de texto.
+ * @param file ubicación del archivo
+ * @param max_length longitud máxima de la cadena de texto
+ * @return cadena de texto con la línea leida
+ */
+char *_read_one_line_file(char *file, int max_length) {
+    // Abrimos el archivo
+    int fd;
+    if ((fd = open_file(file, OF_READ)) == EXIT_FAILURE) {
+        return "";
+    }
+
+    // Leer archivo
+    size_t buffer_size = max_length * sizeof(char) + 1;
+    char *buffer = malloc(buffer_size);
+    if (read_line(fd, buffer, buffer_size) == EXIT_FAILURE) {
+        return "";
+    }
+
+    // Cerramos el archivo
+    close_file(fd);
+    return buffer;
 }

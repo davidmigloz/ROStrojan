@@ -15,8 +15,6 @@ void _print_entry(char *name, int depth);
 
 void _get_new_path(const char *dirPath, char *dirName, char *newDirPath);
 
-int _print_file(int fd);
-
 /**
  * Muestra el contenido del directorio especificado recursivamente.
  * Ej: ver_directorio(".");
@@ -118,14 +116,13 @@ int buscar_archivo(const char *currDir, const char *fileName) {
 
 
 /**
- * Bloquea el archivo pasado como fd y según lo que ponga en rw lo bloquea como lectura o escritura
+ * Bloquea el archivo pasado como fd y según lo que ponga en rw lo bloquea como lectura o escritura.
  * @param fd archivo
- * @param rw 'r' o 'w' segun sea lectura o escritura
+ * @param mode OF_READ o OF_WRITE segun sea lectura o escritura
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
 int bloqueo(int fd, int mode) {
     struct flock lock;
-    memset(&lock, 0, sizeof(lock));
 
     // Establecer bloqueo solicitado
     switch (mode) {
@@ -142,9 +139,9 @@ int bloqueo(int fd, int mode) {
 
     // Resto de opciones del bloquo
     lock.l_whence = SEEK_SET; // From the beginning
-    lock.l_start = 0;        // From byte 0
-    lock.l_len = 0;        // To EOF (0=EOF)
-    lock.l_pid = getpid(); // our PID
+    lock.l_start = 0;         // From byte 0
+    lock.l_len = 0;           // To EOF (0=EOF)
+    lock.l_pid = getpid();    // our PID
 
     // Intentar bloquear
     if (fcntl(fd, F_SETLK, &lock) == -1) {
@@ -167,9 +164,9 @@ int desbloqueo(int fd) {
     // Desbloquear el fichero desde la posicion inicial hasta la final
     lock.l_type = F_UNLCK;
     lock.l_whence = SEEK_SET; // From the beginning
-    lock.l_start = 0;        // From byte 0
-    lock.l_len = 0;        // To EOF (0=EOF)
-    lock.l_pid = getpid(); // our PID
+    lock.l_start = 0;         // From byte 0
+    lock.l_len = 0;           // To EOF (0=EOF)
+    lock.l_pid = getpid();    // our PID
 
     // Intentar bloquear
     if (fcntl(fd, F_SETLK, &lock) == -1) {
@@ -191,11 +188,13 @@ int desbloqueo(int fd) {
  */
 int open_file(const char *file, int mode) {
     int fd;
+
     // Abrir archivo
     if ((fd = open(file, mode)) < 0) {
         perror("Error en la apertura del archivo\n");
         return EXIT_FAILURE;
     }
+
     // Bloquear fichero para lectura
     if (bloqueo(fd, mode) == EXIT_FAILURE) {
         perror("No se ha podido establecer el bloqueo.");
@@ -274,8 +273,8 @@ int ver_archivo(const char *file) {
     do {
         // Iterar sobre una línea (si es más larga que BUFFER_SIZE)
         do {
-            if((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE){
-                return  EXIT_FAILURE;
+            if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
+                return EXIT_FAILURE;
             }
             printf("%s", buffer);
             fflush(stdout);

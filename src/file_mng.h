@@ -49,7 +49,7 @@ int ver_directorio(const char *dirPath);
 int buscar_archivo(const char *currDir, const char *fileName);
 
 /**
- * Bloquea el archivo pasado como fd y según lo que ponga en rw lo bloquea como lectura o escritura
+ * Bloquea el archivo pasado como fd y según lo que ponga en rw lo bloquea como lectura o escritura.
  * @param fd archivo
  * @param mode OF_READ o OF_WRITE segun sea lectura o escritura
  * @return EXIT_FAILURE o EXIT_SUCCESS
@@ -57,7 +57,7 @@ int buscar_archivo(const char *currDir, const char *fileName);
 int bloqueo(int fd, int mode);
 
 /**
- * Desbloquea el archivo bloqueado por este mismo programa
+ * Desbloquea el archivo bloqueado por este mismo programa.
  * @param fd archivo
  * @return EXIT_FAILURE o EXIT_SUCCESS
  */
