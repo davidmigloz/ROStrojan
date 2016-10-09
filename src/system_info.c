@@ -11,15 +11,19 @@
 // PRIVATE HEADERS
 char *_read_one_line_file(char *file, int max_length);
 
-void _print_info_users();
+void _info_user(char *user_line);
 
-void _print_info_user(char *uid);
+void _print_user_info(char *name, char *gid, char *members);
 
-char *_get_user_line(char *uid);
+void _info_group(char *group_line);
 
-char *_parse_passwd_line(char *line, int field);
+void _print_info_group(char *name, char *gid, char *members);
 
-void _print_info(char *uid, char *group, char *home_dir);
+void _iterate_file(char *file);
+
+char *_get_line_by_id(char *id, char *file);
+
+char *_parse_line(char *line, int field);
 
 /**
  * Devuelve el usuario actual del sistema.
@@ -106,114 +110,26 @@ char *_read_one_line_file(char *file, int max_length) {
  */
 void ver_usuario(char *uid) {
     if (uid == NULL) {
-        _print_info_users();
+        _iterate_file(F_PASSWD);
     } else {
-        _print_info_user(uid);
+        _info_user(_get_line_by_id(uid, F_PASSWD));
     }
 }
 
 /**
- * Imprime el uid, grupo principal y directorio home de todos los usuarios del sistema.
+ * Imprime el uid, grupo principal y directorio home del usuario.
+ * @param user_line línea del usuario en el archivo passwd
  */
-void _print_info_users() {
-    int fd, ok;
-    char *buffer = malloc(BUFFER_SIZE);
-    char *tmp = malloc(BUFFER_SIZE);
-    char *username;
-    char *group;
-    char *home_dir;
-
-    // Abrir passwd
-    if ((fd = open_file("/etc/passwd", OF_READ)) == EXIT_FAILURE) {
-        perror("Error al abrir passwd");
-        return;
-    }
-    // Iterar sobre todos los usuarios
-    do {
-        if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
-            perror("Error al leer passwd");
-            return;
-        }
-        // Imprimir info
-        strcpy(tmp, buffer);
-        username = strtok(tmp, ":");
-        group = _parse_passwd_line(buffer, P_GROUP);
-        home_dir = _parse_passwd_line(buffer, P_HOME_DIR);
-        _print_info(username, group, home_dir);
-        puts("------------------");
-    } while (ok != END_OF_FILE);
-    // Liberar memoria
-    free(buffer);
-    free(tmp);
-}
-
-/**
- * Imprime el uid, grupo principal y directorio home del usuario pasado.
- * @param uid nombre de usuario
- */
-void _print_info_user(char *uid) {
-    char *user_line = _get_user_line(uid);
+void _info_user(char *user_line) {
     if (user_line == NULL) {
         puts("El usuario no existe.");
         return;
     }
-    // Obtener grupo y directorio
-    char *group = _parse_passwd_line(user_line, P_GROUP);
-    char *home_dir = _parse_passwd_line(user_line, P_HOME_DIR);
-    _print_info(uid, group, home_dir);
-}
-
-/**
- * Dado un usuario devuelve la línea de ese usuario en el archivo passwd.
- * Si no existe devuelve NULL.
- * @param uid nombre de usuario
- * @return línea del usuario en passwd
- */
-char *_get_user_line(char *uid) {
-    int fd, ok;
-    char *buffer = malloc(BUFFER_SIZE);
-    char *tmp = malloc(BUFFER_SIZE);
-    char *username;
-
-    // Abrir passwd
-    if ((fd = open_file("/etc/passwd", OF_READ)) == EXIT_FAILURE) {
-        return NULL;
-    }
-
-    // Iterar hasta encontrar usuario
-    do {
-        if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
-            return NULL;
-        }
-        // Comprobar si es la línea del usuario
-        strcpy(tmp, buffer);
-        username = strtok(tmp, ":");
-        if (strcmp(uid, username) == 0) {
-            free(tmp);
-            return buffer;
-        }
-    } while (ok != END_OF_FILE);
-    return NULL; // No existe ese usuario
-}
-
-/**
- * Parsea el campo deseado de una línea del archivo passwd.
- * Campos disponibles:
- *      - P_GROUP: grupo primario del usuario.
- *      - P_HOME_DIR: directorio home del usuario.
- * @param line línea del usuario en el archivo passwd
- * @param field campo a extraer
- * @return valor del campo
- */
-char *_parse_passwd_line(char *line, int field) {
-    char *tmp = malloc(BUFFER_SIZE);
-    strcpy(tmp, line);
-    // Obtener campo deseado
-    char *value = strtok(tmp, ":");
-    for (int i = 1; i < field; i++) {
-        value = strtok(NULL, ":");
-    }
-    return value;
+    // Obtener info
+    char *name = _parse_line(user_line, PU_NAME);
+    char *group = _parse_line(user_line, PU_GROUP);
+    char *home_dir = _parse_line(user_line, PU_HOME_DIR);
+    _print_user_info(name, group, home_dir);
 }
 
 /**
@@ -222,6 +138,137 @@ char *_parse_passwd_line(char *line, int field) {
  * @param group grupo
  * @param home_dir directorio home
  */
-void _print_info(char *uid, char *group, char *home_dir) {
+void _print_user_info(char *uid, char *group, char *home_dir) {
     printf("-Usuario:\t%s\n-Grupo:\t\t%s\n-Home dir:\t%s\n", uid, group, home_dir);
+}
+
+/**
+ * Imprime el nombre, gid y miembros del grupo pasado,
+ * o de todos los grupos del sistema si se pasa NULL.
+ * @param gid id del grupo
+ */
+void ver_grupo(char *gid) {
+    if (gid == NULL) {
+        _iterate_file(F_GROUP);
+    } else {
+        _info_group(_get_line_by_id(gid, F_GROUP));
+    }
+}
+
+/**
+ * Imprime el nombre, gid y miembros del grupo.
+ * @param group_line línea del grupo en el archivo group
+ */
+void _info_group(char *group_line) {
+    if (group_line == NULL) {
+        puts("El grupo no existe.");
+        return;
+    }
+    // Obtener info
+    char *name = _parse_line(group_line, PG_NAME);
+    char *gid = _parse_line(group_line, PG_GID);
+    char *members = _parse_line(group_line, PG_MEMBERS);
+    _print_info_group(name, gid, (members == NULL) ? "-" : members);
+}
+
+/**
+ * Imprime por pantalla el nombre del gripo, gid y sus miembros.
+ * @param name nombre grupo
+ * @param gid id del grupo
+ * @param members miembros del griupo
+ */
+void _print_info_group(char *name, char *gid, char *members) {
+    printf("-Nombre:\t%s\n-GID:\t\t%s\n-Miembros:\t%s\n", name, gid, members);
+}
+
+/**
+ * Itera sobre los distintos usuarios o grupos del sistema.
+ * @param file PASSWD para usuarios o GROUP para grupos
+ */
+void _iterate_file(char *file) {
+    int fd, ok;
+    char *buffer = malloc(BUFFER_SIZE);
+    char *tmp = malloc(BUFFER_SIZE);
+
+    // Abrir archivo
+    if ((fd = open_file(file, OF_READ)) == EXIT_FAILURE) {
+        perror("Error al abrir archivo");
+        return;
+    }
+    // Iterar sobre todos los usuarios/grupos
+    do {
+        if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
+            perror("Error al leer passwd");
+            return;
+        }
+        // Imprimir info
+        if (strcmp(file, F_PASSWD) == 0) {
+            _info_user(buffer);
+        } else {
+            _info_group(buffer);
+
+        }
+        puts("------------------");
+    } while (ok != END_OF_FILE);
+    // Liberar memoria
+    free(buffer);
+    free(tmp);
+}
+
+/**
+ * Dado un uid/gid devuelve la línea de ese usuario/grupo en el archivo passwd/group.
+ * Si no existe devuelve NULL.
+ * @param id uid de usuario o gid de grupo
+ * @param file PASSWD para usuarios o GROUP para grupos
+ * @return línea del usuario o grupo
+ */
+char *_get_line_by_id(char *id, char *file) {
+    int fd, ok;
+    char *buffer = malloc(BUFFER_SIZE);
+    char *tmp = malloc(BUFFER_SIZE);
+    char *name;
+
+    // Abrir archivo
+    if ((fd = open_file(file, OF_READ)) == EXIT_FAILURE) {
+        return NULL;
+    }
+    // Iterar hasta encontrar id
+    do {
+        if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
+            return NULL;
+        }
+        // Comprobar si es la línea con ese id
+        strcpy(tmp, buffer);
+        name = strtok(tmp, ":");
+        if (strcmp(id, name) == 0) {
+            free(tmp);
+            return buffer;
+        }
+    } while (ok != END_OF_FILE);
+    return NULL; // No existe
+}
+
+/**
+ * Parsea el campo deseado de una línea del archivo passwd o group.
+ * Campos disponibles para usuarios:
+ *      - PU_NAME: nombre de usuario.
+ *      - PU_GROUP: grupo primario del usuario.
+ *      - PU_HOME_DIR: directorio home del usuario.
+ * Campos disponibles para grupos:
+ *      - PG_NAME: nombre del grupo.
+ *      - PG_GID: id del grupo.
+ *      - PG_MEMBERS: miembros del grupo.
+ * @param line línea del usuario/grupo en el archivo passwd/group
+ * @param field campo a extraer
+ * @return valor del campo
+ */
+char *_parse_line(char *line, int field) {
+    char *tmp = malloc(BUFFER_SIZE);
+    strcpy(tmp, line);
+    // Obtener campo deseado
+    char *value = strtok(tmp, ":");
+    for (int i = 1; i < field; i++) {
+        value = strtok(NULL, ":");
+    }
+    return value;
 }

@@ -72,7 +72,7 @@ int desbloqueo(int fd);
  * @param mode modo con el que abrir y bloquear: OF_READ o OF_WRITE.
  * @return El descriptor de archivo del archivo abierto y bloqueado.
  */
-int open_file(const char* file, int mode);
+int open_file(const char *file, int mode);
 
 /**
  * Cierra un archivo despues de desbloquearle.
@@ -94,7 +94,7 @@ int close_file(int fd);
  *         END_OF_FILE  si línea <  buffer_size y EOF encontrado,
  *         EXIT_FAILURE si error
  */
-int read_line(int fd, char* buffer, size_t buffer_size);
+int read_line(int fd, char *buffer, size_t buffer_size);
 
 /**
  * Imprime por pantalla el archivo pasado.

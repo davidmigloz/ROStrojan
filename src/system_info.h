@@ -15,8 +15,14 @@
 #include "file_mng.h"
 
 // CONSTANTS
-#define P_GROUP 4
-#define P_HOME_DIR 6
+#define PU_NAME     1
+#define PU_GROUP    4
+#define PU_HOME_DIR 6
+#define PG_NAME     1
+#define PG_GID      3
+#define PG_MEMBERS  4
+#define F_PASSWD    "/etc/passwd"
+#define F_GROUP     "/etc/group"
 
 // PROTOTYPES
 
@@ -55,5 +61,13 @@ char *ver_ip();
  * o de todos los usuarios del sistema si se pasa NULL.
  * @param uid nombre de usuario
  */
-void ver_usuario(char* uid);
+void ver_usuario(char *uid);
+
+/**
+ * Imprime el nombre, gid y miembros del grupo pasado,
+ * o de todos los grupos del sistema si se pasa NULL.
+ * @param gid id del grupo
+ */
+void ver_grupo(char *gid);
+
 #endif

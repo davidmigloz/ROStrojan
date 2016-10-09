@@ -31,6 +31,8 @@ void test_ver_ip();
 
 void test_ver_usuario();
 
+void test_ver_grupo();
+
 char *concat_path(const char *s1, const char *s2);
 
 int ls_locks();
@@ -56,6 +58,7 @@ void run_tests() {
 //    test_ver_kernel();
 //    test_ver_ip();
     test_ver_usuario();
+    test_ver_grupo();
 }
 
 
@@ -209,6 +212,18 @@ void test_ver_usuario() {
     ver_usuario(NULL);
 }
 
+void test_ver_grupo() {
+    puts("----------------------------------");
+    puts("| Test_ver_grupo()               |");
+    puts("----------------------------------");
+
+    puts("\nTest: grupo inexistente");
+    ver_grupo("hackers2000");
+    puts("\nTest: grupo existente (adm)");
+    ver_grupo("adm");
+    puts("\nTest: todos los grupos");
+    ver_grupo(NULL);
+}
 
 /////////////////////////
 // Utils
