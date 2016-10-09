@@ -48,4 +48,7 @@ char *ver_kernel();
  */
 char *ver_ip();
 
+
+
+int ver_usuario(char *uid, char* buffer[3]);
 #endif

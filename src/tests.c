@@ -51,8 +51,9 @@ void run_tests() {
 //    test_ver_usuario_actual();
 //    test_ver_equipo();
 //    test_ver_sistema();
-    test_ver_kernel();
+//    test_ver_kernel();
 //    test_ver_ip();
+    test_ver_usuario();
 }
 
 
@@ -147,6 +148,8 @@ void test_read_line() {
     close_file(fd);
 }
 
+
+
 /////////////////////////
 // system_info.h tests
 /////////////////////////
@@ -190,6 +193,18 @@ void test_ver_ip() {
 
     puts(ver_ip());
 }
+
+void test_ver_usuario() {
+    puts("----------------------------------");
+    puts("| Test_ver_usuario()             |");
+    puts("----------------------------------");
+    char* buffer[3];
+    for(int i=0; i<3; i++)
+        buffer[i] = malloc(sizeof(char)*BUFFER_SIZE);
+    ver_usuario("1000", buffer);
+    printf("Usuario: %s\t\tGrupo: %s\t\tDirectorio: %s", buffer[0], buffer[1], buffer[2]);
+}
+
 
 /////////////////////////
 // Utils
