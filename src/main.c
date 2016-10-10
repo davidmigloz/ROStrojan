@@ -6,8 +6,8 @@ int menu(int argc, char **argv);
 
 
 int main(int argc, char **argv) {
-    //run_tests();
-    return menu(argc, argv);
+    run_tests();
+    //return menu(argc, argv);
 }
 
 

@@ -46,17 +46,17 @@ void run_tests() {
     const char *homedir = pw->pw_dir;
     testDirPath = concat_path(homedir, "ClionProjects/ROStrojan/test");
     // Test: file_mnh.h
-//    test_ver_directorio();
-//    test_buscar_archivo();
-//    test_bloqueo();
-//    test_ver_archivo();
-//    test_read_line();
+    test_ver_directorio();
+    test_buscar_archivo();
+    test_bloqueo();
+    test_ver_archivo();
+    test_read_line();
     // Test
-//    test_ver_usuario_actual();
-//    test_ver_equipo();
-//    test_ver_sistema();
-//    test_ver_kernel();
-//    test_ver_ip();
+    test_ver_usuario_actual();
+    test_ver_equipo();
+    test_ver_sistema();
+    test_ver_kernel();
+    test_ver_ip();
     test_ver_usuario();
     test_ver_grupo();
 }
@@ -207,7 +207,7 @@ void test_ver_usuario() {
     puts("\nTest: usuario inexistente");
     ver_usuario("hacker2000");
     puts("\nTest: usuario existente (root)");
-    ver_usuario("root");
+    ver_usuario("0");
     puts("\nTest: todos los usuarios");
     ver_usuario(NULL);
 }
@@ -219,8 +219,8 @@ void test_ver_grupo() {
 
     puts("\nTest: grupo inexistente");
     ver_grupo("hackers2000");
-    puts("\nTest: grupo existente (adm)");
-    ver_grupo("adm");
+    puts("\nTest: grupo existente (daemon)");
+    ver_grupo("1");
     puts("\nTest: todos los grupos");
     ver_grupo(NULL);
 }
