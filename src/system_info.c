@@ -192,12 +192,16 @@ void _iterate_file(char *file) {
 
     // Abrir archivo
     if ((fd = open_file(file, OF_READ)) == EXIT_FAILURE) {
+        free(buffer);
+        free(tmp);
         perror("Error al abrir archivo");
         return;
     }
     // Iterar sobre todos los usuarios/grupos
     do {
         if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
+            free(buffer);
+            free(tmp);
             perror("Error al leer passwd");
             return;
         }
@@ -230,21 +234,29 @@ char *_get_line_by_id(char *id, char *file) {
 
     // Abrir archivo
     if ((fd = open_file(file, OF_READ)) == EXIT_FAILURE) {
+        free(buffer);
+        free(tmp);
         return NULL;
     }
     // Iterar hasta encontrar id
     do {
         if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
+            free(buffer);
+            free(tmp);
             return NULL;
         }
         // Comprobar si es la línea con ese id
         strcpy(tmp, buffer);
         name = strtok(tmp, ":");
         if (strcmp(id, name) == 0) {
+            free(buffer);
             free(tmp);
             return buffer;
         }
     } while (ok != END_OF_FILE);
+
+    free(buffer);
+    free(tmp);
     return NULL; // No existe
 }
 
@@ -270,5 +282,6 @@ char *_parse_line(char *line, int field) {
     for (int i = 1; i < field; i++) {
         value = strtok(NULL, ":");
     }
+    free(tmp);
     return value;
 }
