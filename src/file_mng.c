@@ -274,6 +274,7 @@ int ver_archivo(const char *file) {
         // Iterar sobre una línea (si es más larga que BUFFER_SIZE)
         do {
             if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
+                close_file(fd);
                 return EXIT_FAILURE;
             }
             printf("%s", buffer);

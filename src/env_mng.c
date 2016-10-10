@@ -76,6 +76,10 @@ int creat_entorno(char *entorno) {
         }
     } while (ok != END_OF_FILE);
     close_file(fd);
-    return EXIT_FAILURE;
-    //TODO: crear el entorno aqui por que no existe
+    if ((fd = open_file("../entorno.dat", OF_WRITE)) == EXIT_FAILURE) { return EXIT_FAILURE; }
+    lseek(fd, 0, SEEK_END);
+    write(fd, entorno, strlen(entorno));
+    write(fd, "\n", sizeof(char));
+    close_file(fd);
+    return EXIT_SUCCESS;
 }
