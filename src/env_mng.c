@@ -77,7 +77,9 @@ int creat_entorno(char *entorno) {
     } while (ok != END_OF_FILE);
     close_file(fd);
     if ((fd = open_file("../entorno.dat", OF_WRITE)) == EXIT_FAILURE) { return EXIT_FAILURE; }
-    lseek(fd, , SEEK_END);
-
-
+    lseek(fd, 0, SEEK_END);
+    write(fd, entorno, sizeof(entorno));
+    write(fd, "\n", sizeof(char));
+    close_file(fd);
+    return EXIT_SUCCESS;
 }
