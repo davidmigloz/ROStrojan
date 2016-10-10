@@ -1,5 +1,9 @@
 #include "tests.h"
+
 #define N_ARGS_DEF 2
+
+int menu(int argc, char **argv);
+
 
 int main(int argc, char **argv) {
     //run_tests();
@@ -7,16 +11,22 @@ int main(int argc, char **argv) {
 }
 
 
-int menu(int argc, char **argv){
+/**
+ * Menu principal de la aplicacion. Recibe los mismos argumentos que el main.
+ * @param argc
+ * @param argv
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
+int menu(int argc, char **argv) {
 
     int ret = EXIT_FAILURE;
 
     char path[PATH_MAX];
     char *f_arg = argv[1];
 
-    if(f_arg[0]!='-'){ return EXIT_FAILURE; }
+    if (f_arg[0] != '-') { return EXIT_FAILURE; }
 
-    switch(f_arg[1]){
+    switch (f_arg[1]) {
         case 's':
             ret = buscar_archivo(getcwd(path, PATH_MAX), argv[2]);
             break;
@@ -27,17 +37,17 @@ int menu(int argc, char **argv){
             ret = ver_archivo(argv[2]);
             break;
         case 'e':
-            switch(argc){
-                case N_ARGS_DEF+0:
+            switch (argc) {
+                case N_ARGS_DEF + 0:
 
                     break;
-                case N_ARGS_DEF+1:
+                case N_ARGS_DEF + 1:
 
                     break;
-                case N_ARGS_DEF+2:
+                case N_ARGS_DEF + 2:
 
                     break;
-                case N_ARGS_DEF+3:
+                case N_ARGS_DEF + 3:
 
                     break;
                 default:
@@ -45,12 +55,12 @@ int menu(int argc, char **argv){
             }
             break;
         case 'u':
-            if(argc==N_ARGS_DEF){ ver_usuario(NULL); }
-            else if(argc==N_ARGS_DEF+1){ ver_usuario(argv[2]); }
+            if (argc == N_ARGS_DEF) { ver_usuario(NULL); }
+            else if (argc == N_ARGS_DEF + 1) { ver_usuario(argv[2]); }
             break;
         case 'g':
-            if(argc==N_ARGS_DEF){ ver_grupo(NULL); }
-            else if(argc==N_ARGS_DEF+1){ ver_grupo(argv[2]); }
+            if (argc == N_ARGS_DEF) { ver_grupo(NULL); }
+            else if (argc == N_ARGS_DEF + 1) { ver_grupo(argv[2]); }
             break;
         case 'U':
             printf("Usuario actual:\t%s", ver_usuario_actual());

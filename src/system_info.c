@@ -247,9 +247,10 @@ char *_get_line_by_id(char *id, char *file) {
         }
         // Comprobar si es la línea con ese id
         strcpy(tmp, buffer);
-        name = strtok(tmp, ":");
+        strtok(tmp, ":");
+        strtok(NULL, ":");
+        name = strtok(NULL, ":");
         if (strcmp(id, name) == 0) {
-            free(buffer);
             free(tmp);
             return buffer;
         }
