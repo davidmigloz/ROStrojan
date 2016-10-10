@@ -1,4 +1,7 @@
 #include "tests.h"
+#include "file_mng.h"
+#include "env_mng.h"
+#include "system_info.h"
 
 #define N_ARGS_DEF 2
 
@@ -39,7 +42,7 @@ int menu(int argc, char **argv) {
         case 'e':
             switch (argc) {
                 case N_ARGS_DEF + 0:
-
+                    mostrar_entornos();
                     break;
                 case N_ARGS_DEF + 1:
 

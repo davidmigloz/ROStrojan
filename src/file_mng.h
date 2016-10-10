@@ -103,4 +103,13 @@ int read_line(int fd, char *buffer, size_t buffer_size);
  */
 int ver_archivo(const char *file);
 
+
+/**
+ * Imprime la entrada indentada dependiendo de la profundidad.
+ *
+ * @param name nombre a imprimir
+ * @param depth profundidad
+ */
+void _print_entry(char *name, int depth);
+
 #endif

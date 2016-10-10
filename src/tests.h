@@ -18,6 +18,7 @@
 
 #include "file_mng.h"
 #include "system_info.h"
+#include "env_mng.h"
 
 // PROTOTYPES
 

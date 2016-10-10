@@ -6,7 +6,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/file_mng.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/system_info.c" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/env_mng.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/tests.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/env_mng.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/file_mng.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/tests.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
