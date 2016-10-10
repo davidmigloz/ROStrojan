@@ -89,6 +89,7 @@ char *ver_ip() {
             free(line_prev);
             free(line_act);
             free(ips);
+            close_file(fd);
             return NULL;
         }
         // Comprobar si se ha llegado a la sección "Local" -> salir
@@ -96,6 +97,7 @@ char *ver_ip() {
             ips[strlen(ips) - 2] = '\0'; // Quitar último separador
             free(line_prev);
             free(line_act);
+            close_file(fd);
             return ips;
         }
         // Comprobar si la línea contine "32 host LOCAL"
@@ -115,6 +117,7 @@ char *ver_ip() {
     free(line_prev);
     free(line_act);
     free(ips);
+    close_file(fd);
     return ips;
 }
 
@@ -135,6 +138,7 @@ char *_read_one_line_file(char *file, int max_length) {
     size_t buffer_size = (size_t) (max_length + 1);
     char *buffer = malloc(buffer_size);
     if (read_line(fd, buffer, buffer_size) == EXIT_FAILURE) {
+        close_file(fd);
         return "";
     }
 
@@ -234,6 +238,7 @@ void _iterate_file(char *file) {
     if ((fd = open_file(file, OF_READ)) == EXIT_FAILURE) {
         free(buffer);
         free(tmp);
+        close_file(fd);
         perror("Error al abrir archivo");
         return;
     }
@@ -242,6 +247,7 @@ void _iterate_file(char *file) {
         if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
             free(buffer);
             free(tmp);
+            close_file(fd);
             perror("Error al leer passwd");
             return;
         }
@@ -255,6 +261,7 @@ void _iterate_file(char *file) {
         puts("------------------");
     } while (ok != END_OF_FILE);
     // Liberar memoria
+    close_file(fd);
     free(buffer);
     free(tmp);
 }
@@ -279,17 +286,20 @@ char *_get_line_by_id(char *id, char *file) {
     // Iterar hasta encontrar id
     do {
         if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
+            close_file(fd);
             free(buffer);
             return NULL;
         }
         // Comprobar si es la línea con ese id
         id_read = _parse_line(buffer, P_ID);
         if (strcmp(id, id_read) == 0) {
+            close_file(fd);
             return buffer;
         }
     } while (ok != END_OF_FILE);
     // Liberar memoria
     free(buffer);
+    close_file(fd);
     return NULL; // No existe
 }
 

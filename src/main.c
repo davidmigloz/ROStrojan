@@ -5,12 +5,13 @@
 
 #define N_ARGS_DEF 2
 
+
 int menu(int argc, char **argv);
 
 
 int main(int argc, char **argv) {
-    run_tests();
-    //return menu(argc, argv);
+    //run_tests();
+    return menu(argc, argv);
 }
 
 
@@ -42,10 +43,10 @@ int menu(int argc, char **argv) {
         case 'e':
             switch (argc) {
                 case N_ARGS_DEF + 0:
-                    mostrar_entornos();
+                    ret = mostrar_entornos();
                     break;
                 case N_ARGS_DEF + 1:
-
+                    ret = creat_entorno(argv[2]);
                     break;
                 case N_ARGS_DEF + 2:
 

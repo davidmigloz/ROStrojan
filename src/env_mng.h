@@ -21,4 +21,5 @@
  */
 int mostrar_entornos();
 
+int creat_entorno(char *entorno);
 #endif //ROSTROJAN_ENV_MNG_H
