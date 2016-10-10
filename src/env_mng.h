@@ -19,6 +19,6 @@
  * Muestra todas las variables de entorno creadas en el entotno en el que estan.
  * @return EXIT_SUCCESS o EXIT_FAILURE
  */
-int mostrar_entornos()
+int mostrar_entornos();
 
 #endif //ROSTROJAN_ENV_MNG_H

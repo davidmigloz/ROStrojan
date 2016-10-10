@@ -15,6 +15,7 @@
 #include "file_mng.h"
 
 // CONSTANTS
+#define P_ID        3
 #define PU_NAME     1
 #define PU_GROUP    4
 #define PU_HOME_DIR 6

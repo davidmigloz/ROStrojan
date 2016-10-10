@@ -230,7 +230,7 @@ char *_get_line_by_id(char *id, char *file) {
     int fd, ok;
     char *buffer = malloc(BUFFER_SIZE);
     char *tmp = malloc(BUFFER_SIZE);
-    char *name;
+    char *id_read;
 
     // Abrir archivo
     if ((fd = open_file(file, OF_READ)) == EXIT_FAILURE) {
@@ -246,16 +246,13 @@ char *_get_line_by_id(char *id, char *file) {
             return NULL;
         }
         // Comprobar si es la línea con ese id
-        strcpy(tmp, buffer);
-        strtok(tmp, ":");
-        strtok(NULL, ":");
-        name = strtok(NULL, ":");
-        if (strcmp(id, name) == 0) {
+        id_read = _parse_line(buffer, P_ID);
+        if (strcmp(id, id_read) == 0) {
             free(tmp);
             return buffer;
         }
     } while (ok != END_OF_FILE);
-
+    // Liberar memoria
     free(buffer);
     free(tmp);
     return NULL; // No existe

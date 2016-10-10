@@ -210,6 +210,7 @@ void test_ver_usuario() {
     ver_usuario("0");
     puts("\nTest: todos los usuarios");
     ver_usuario(NULL);
+    puts("");
 }
 
 void test_ver_grupo() {
@@ -219,10 +220,11 @@ void test_ver_grupo() {
 
     puts("\nTest: grupo inexistente");
     ver_grupo("hackers2000");
-    puts("\nTest: grupo existente (daemon)");
-    ver_grupo("1");
+    puts("\nTest: grupo existente (adm)");
+    ver_grupo("4");
     puts("\nTest: todos los grupos");
     ver_grupo(NULL);
+    puts("");
 }
 
 /////////////////////////
