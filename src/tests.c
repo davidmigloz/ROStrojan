@@ -46,19 +46,19 @@ void run_tests() {
     const char *homedir = pw->pw_dir;
     testDirPath = concat_path(homedir, "ClionProjects/ROStrojan/test");
     // Test: file_mnh.h
-    test_ver_directorio();
-    test_buscar_archivo();
-    test_bloqueo();
-    test_ver_archivo();
-    test_read_line();
+//    test_ver_directorio();
+//    test_buscar_archivo();
+//    test_bloqueo();
+//    test_ver_archivo();
+//    test_read_line();
     // Test
-    test_ver_usuario_actual();
-    test_ver_equipo();
-    test_ver_sistema();
-    test_ver_kernel();
+//    test_ver_usuario_actual();
+//    test_ver_equipo();
+//    test_ver_sistema();
+//    test_ver_kernel();
     test_ver_ip();
-    test_ver_usuario();
-    test_ver_grupo();
+//    test_ver_usuario();
+//    test_ver_grupo();
 }
 
 

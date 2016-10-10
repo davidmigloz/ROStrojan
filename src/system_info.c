@@ -65,17 +65,57 @@ char *ver_kernel() {
 }
 
 /**
- * Muestra la IP del equipo (host name).
- * @return pointer to a string
+ * Muestra la IP (o las IPs) del equipo.
+ * Estas las obtiene del fichero /proc/net/fib_trie.
+ *
+ * @return cadena con la/s IPs
  */
 char *ver_ip() {
-    FILE *pp = popen("hostname --ip-address", "r");
-    char *line = NULL;
-    char buf[BUFFER_SIZE];
-    if (pp != NULL) {
-        line = fgets(buf, sizeof buf, pp);
+    // Abrir archivo
+    int fd, ok;
+    if ((fd = open_file("/proc/net/fib_trie", OF_READ)) == EXIT_FAILURE) {
+        perror("Error al abrir archivo");
+        return NULL;
     }
-    return line;
+    // Recorrer archivo
+    char *line_prev = malloc(BUFFER_SIZE);
+    char *line_act = malloc(BUFFER_SIZE);
+    char *ips = malloc(BUFFER_SIZE);
+    ips[0] = '\0';
+
+    do {
+        if ((ok = read_line(fd, line_act, BUFFER_SIZE)) == EXIT_FAILURE) {
+            perror("Error al leer passwd");
+            free(line_prev);
+            free(line_act);
+            free(ips);
+            return NULL;
+        }
+        // Comprobar si se ha llegado a la sección "Local" -> salir
+        if (strstr(line_act, "Local") != NULL) {
+            ips[strlen(ips) - 2] = '\0'; // Quitar último separador
+            free(line_prev);
+            free(line_act);
+            return ips;
+        }
+        // Comprobar si la línea contine "32 host LOCAL"
+        if (strstr(line_act, "32 host LOCAL") != NULL) {
+            // Si es así la IP está en la línea anterior
+            for (int i = 0; i < strlen(line_prev); i++) {
+                if (isdigit(line_prev[i])) {
+                    strcat(ips, strncpy(line_prev, line_prev + i, strlen(line_prev) - (i - 1)));
+                    strcat(ips, " / ");
+                }
+            }
+        }
+        // Si no lo contiene, copiar la línea actial a línea anterior
+        strcpy(line_prev, line_act);
+    } while (ok != END_OF_FILE);
+    // Liberar memoria
+    free(line_prev);
+    free(line_act);
+    free(ips);
+    return ips;
 }
 
 /**
@@ -92,7 +132,7 @@ char *_read_one_line_file(char *file, int max_length) {
     }
 
     // Leer archivo
-    size_t buffer_size = max_length * sizeof(char) + 1;
+    size_t buffer_size = (size_t) (max_length + 1);
     char *buffer = malloc(buffer_size);
     if (read_line(fd, buffer, buffer_size) == EXIT_FAILURE) {
         return "";
@@ -229,32 +269,27 @@ void _iterate_file(char *file) {
 char *_get_line_by_id(char *id, char *file) {
     int fd, ok;
     char *buffer = malloc(BUFFER_SIZE);
-    char *tmp = malloc(BUFFER_SIZE);
     char *id_read;
 
     // Abrir archivo
     if ((fd = open_file(file, OF_READ)) == EXIT_FAILURE) {
         free(buffer);
-        free(tmp);
         return NULL;
     }
     // Iterar hasta encontrar id
     do {
         if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
             free(buffer);
-            free(tmp);
             return NULL;
         }
         // Comprobar si es la línea con ese id
         id_read = _parse_line(buffer, P_ID);
         if (strcmp(id, id_read) == 0) {
-            free(tmp);
             return buffer;
         }
     } while (ok != END_OF_FILE);
     // Liberar memoria
     free(buffer);
-    free(tmp);
     return NULL; // No existe
 }
 
@@ -280,6 +315,5 @@ char *_parse_line(char *line, int field) {
     for (int i = 1; i < field; i++) {
         value = strtok(NULL, ":");
     }
-    free(tmp);
     return value;
 }

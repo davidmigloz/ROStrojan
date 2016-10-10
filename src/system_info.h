@@ -11,6 +11,7 @@
 
 // INCLUDES
 #include <unistd.h>
+#include <ctype.h>
 
 #include "file_mng.h"
 
@@ -52,8 +53,10 @@ char *ver_sistema();
 char *ver_kernel();
 
 /**
- * Devuelve la IP del equipo (host name).
- * @@param hostname  pointer to a string
+ * Muestra la IP (o las IPs) del equipo.
+ * Estas las obtiene del fichero /proc/net/fib_trie.
+ *
+ * @return cadena con la/s IPs
  */
 char *ver_ip();
 
