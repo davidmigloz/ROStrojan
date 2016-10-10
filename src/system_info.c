@@ -102,13 +102,18 @@ char *ver_ip() {
         }
         // Comprobar si la línea contine "32 host LOCAL"
         if (strstr(line_act, "32 host LOCAL") != NULL) {
-            // Si es así la IP está en la línea anterior
-            for (int i = 0; i < strlen(line_prev); i++) {
-                if (isdigit(line_prev[i])) {
-                    strcat(ips, strncpy(line_prev, line_prev + i, strlen(line_prev) - (i - 1)));
-                    strcat(ips, " / ");
+            if (strstr(line_prev, "127.0.0.1") != NULL) {
+                // Si es Loopback IP -> no mostrar
+            } else {
+                // Si no, la IP está en la línea anterior
+                for (int i = 0; i < strlen(line_prev); i++) {
+                    if (isdigit(line_prev[i])) {
+                        strcat(ips, strncpy(line_prev, line_prev + i, strlen(line_prev) - (i - 1)));
+                        strcat(ips, " / ");
+                    }
                 }
             }
+
         }
         // Si no lo contiene, copiar la línea actial a línea anterior
         strcpy(line_prev, line_act);
@@ -117,6 +122,7 @@ char *ver_ip() {
     free(line_prev);
     free(line_act);
     free(ips);
+    // Cerrar archivo
     close_file(fd);
     return ips;
 }
