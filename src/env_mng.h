@@ -14,6 +14,9 @@
 //INCLUDES
 #include "file_mng.h"
 
+//DEFINES
+#define N_E_ENV 2
+
 // PROTOTYPES
 /**
  * Muestra todas las variables de entorno creadas en el entotno en el que estan.
@@ -21,5 +24,10 @@
  */
 int mostrar_entornos();
 
+int ver_variable(char *entorno, char *variable);
+
+
 int creat_entorno(char *entorno);
+
+
 #endif //ROSTROJAN_ENV_MNG_H

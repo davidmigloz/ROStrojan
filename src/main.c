@@ -49,7 +49,7 @@ int menu(int argc, char **argv) {
                     ret = creat_entorno(argv[2]);
                     break;
                 case N_ARGS_DEF + 2:
-
+                    ret = ver_variable(argv[2], argv[3]);
                     break;
                 case N_ARGS_DEF + 3:
 
