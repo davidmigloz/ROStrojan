@@ -235,9 +235,8 @@ int read_line(int fd, char *buffer, size_t buffer_size) {
     if ((bytes_read = read(fd, buffer, buffer_size - 1)) <= 0) {
         return bytes_read == 0 ? END_OF_FILE : EXIT_FAILURE;
     }
-
     // Buscar fin de línea
-    for (int i = 0; i < strlen(buffer)+1; i++) {
+    for (int i = 0; i < strlen(buffer); i++) {
         if (buffer[i] == '\n') {
             // Reemplazar \n por \0
             buffer[i] = '\0';
@@ -251,7 +250,6 @@ int read_line(int fd, char *buffer, size_t buffer_size) {
                 return EXIT_SUCCESS;
             }
         }
-
     }
     return LONG_LINE;
 }
