@@ -22,8 +22,11 @@
 // CONSTANTS
 
 #define BUFFER_SIZE 1024
-#define OF_READ 00
-#define OF_WRITE 01
+#define OF_READ   00
+#define OF_WRITE  01
+#define OF_RDWR   02
+#define OF_CREAT  0100
+#define OF_APPEND 02000
 #define LONG_LINE -1
 #define END_OF_FILE -2
 

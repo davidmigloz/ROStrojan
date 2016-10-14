@@ -1,4 +1,3 @@
-#include "tests.h"
 #include "file_mng.h"
 #include "env_mng.h"
 #include "system_info.h"
@@ -32,24 +31,29 @@ int menu(int argc, char **argv) {
 
     switch (f_arg[1]) {
         case 's':
-            ret = buscar_archivo(getcwd(path, PATH_MAX), argv[2]);
+            if (argv[2] != NULL)
+                ret = buscar_archivo(getcwd(path, PATH_MAX), argv[2]);
             break;
         case 'd':
-            ret = ver_directorio(argv[2]);
+            if (argv[2] != NULL)
+                ver_directorio(argv[2]);
             break;
         case 'a':
-            ret = ver_archivo(argv[2]);
+            if (argv[2] != NULL)
+                ret = ver_archivo(argv[2]);
             break;
         case 'e':
             switch (argc) {
                 case N_ARGS_DEF + 0:
-                    ret = mostrar_entornos();
+                    ret = ver_entorno(NULL, NULL);
                     break;
                 case N_ARGS_DEF + 1:
-                    ret = creat_entorno(argv[2]);
+                    if (argv[2] != NULL)
+                        ret = ver_entorno(argv[2], NULL);
                     break;
                 case N_ARGS_DEF + 2:
-                    ret = ver_variable(argv[2], argv[3]);
+                    if (argv[2] != NULL)
+                        ret = ver_entorno(argv[2], argv[3]);
                     break;
                 case N_ARGS_DEF + 3:
 
@@ -59,27 +63,31 @@ int menu(int argc, char **argv) {
             }
             break;
         case 'u':
-            if (argc == N_ARGS_DEF) { ver_usuario(NULL); }
-            else if (argc == N_ARGS_DEF + 1) { ver_usuario(argv[2]); }
+            if (argc == N_ARGS_DEF)
+                ver_usuario(NULL);
+            else if (argc == N_ARGS_DEF + 1 && argv[2] != NULL)
+                ver_usuario(argv[2]);
             break;
         case 'g':
-            if (argc == N_ARGS_DEF) { ver_grupo(NULL); }
-            else if (argc == N_ARGS_DEF + 1) { ver_grupo(argv[2]); }
+            if (argc == N_ARGS_DEF)
+                ver_grupo(NULL);
+            else if (argc == N_ARGS_DEF + 1 && argv[2] != NULL)
+                ver_grupo(argv[2]);
             break;
         case 'U':
-            printf("Usuario actual:\t%s", ver_usuario_actual());
+            printf("Usuario actual:\t%s\n", ver_usuario_actual());
             break;
         case 'h':
-            printf("Nombre del equipo:\t%s", ver_equipo());
+            printf("Nombre del equipo:\t%s\n", ver_equipo());
             break;
         case 'S':
-            printf("Sistema operativo:\t%s", ver_sistema());
+            printf("Sistema operativo:\t%s\n", ver_sistema());
             break;
         case 'k':
-            printf("Kernel:\t%s", ver_kernel());
+            printf("Kernel:\t%s\n", ver_kernel());
             break;
         case 'n':
-            printf("Ip:\t%s", ver_ip());
+            printf("Ip:\t%s\n", ver_ip());
             break;
         default:
             //TODO: help();

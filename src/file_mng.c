@@ -127,11 +127,20 @@ int bloqueo(int fd, int mode) {
     // Establecer bloqueo solicitado
     switch (mode) {
         case OF_READ:
+        case OF_CREAT | OF_READ:
             lock.l_type = F_RDLCK; // Read block
             break;
         case OF_WRITE:
+        case OF_RDWR:
+        case OF_CREAT | OF_WRITE:
+        case OF_CREAT | OF_RDWR:
+        case OF_APPEND | OF_WRITE:
+        case OF_APPEND | OF_RDWR:
+        case OF_APPEND | OF_CREAT | OF_WRITE:
+        case OF_APPEND | OF_CREAT | OF_RDWR:
             lock.l_type = F_WRLCK; // Write block
             break;
+
         default:
             perror("Segundo parametro incorrecto.");
             return EXIT_FAILURE;
@@ -190,7 +199,8 @@ int open_file(const char *file, int mode) {
     int fd;
 
     // Abrir archivo
-    if ((fd = open(file, mode)) < 0) {
+    mode_t file_permission = S_IRWXU;
+    if ((fd = open(file, mode, file_permission)) < 0) {
         perror("Error en la apertura del archivo\n");
         return EXIT_FAILURE;
     }

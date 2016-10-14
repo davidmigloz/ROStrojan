@@ -6,8 +6,6 @@
  * ****************************************************************************
  */
 
-
-
 #ifndef ROSTROJAN_ENV_MNG_H
 #define ROSTROJAN_ENV_MNG_H
 
@@ -18,16 +16,20 @@
 #define N_E_ENV 2
 
 // PROTOTYPES
+
 /**
- * Muestra todas las variables de entorno creadas en el entotno en el que estan.
+ * Muestra el contenido del fichero entorno.dat.
+ * Si no existe el fichero, lo crea.
+ * Si se le pasa una sección, muestra solo el contenido de esta.
+ * Si no existe la sección, la crea.
+ * Si se le pasa una sección y una variable, muestra el contenido de esta.
+ * @param sec nombre de la sección (o NULL)
+ * @param var nombre de la variable (o NULL)
  * @return EXIT_SUCCESS o EXIT_FAILURE
  */
-int mostrar_entornos();
+int ver_entorno(char *sec, char *var);
 
-int ver_variable(char *entorno, char *variable);
-
-
-int creat_entorno(char *entorno);
+int modificar_entorno(char *sec, char *var, char *val);
 
 
-#endif //ROSTROJAN_ENV_MNG_H
+#endif
