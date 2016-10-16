@@ -7,8 +7,6 @@
  */
 #include "env_mng.h"
 
-int open_env(int mode);
-
 // PRIVATE HEADERS
 int _print_env();
 
@@ -18,7 +16,19 @@ int _print_var(char *sec, char *var);
 
 int _find_env(int fd, char *env);
 
-int check_field(const char *field);
+int _check_field(const char *field);
+
+int _write_line(int fd, char *line);
+
+int _create_var(int fd, char *var, char *val);
+
+int _modify_var(int fd, int line_size, char *var, char *val);
+
+int _modify_line(int fd, int line_size, char *new_line);
+
+int _copy_to_EOF(int fd_src, int fd_des);
+
+void _create_var_line(char *buffer, char *var, char *val);
 
 /**
  * Muestra el contenido del fichero entorno.dat.
@@ -62,7 +72,7 @@ int _print_env() {
             return EXIT_FAILURE;
         }
         // Si tiene > imprime con 2 indentaciones, si no con una
-        _print_entry(buffer, check_field(buffer) ? 2 : 1);
+        _print_entry(buffer, _check_field(buffer) ? 2 : 1);
     } while (ok != END_OF_FILE);
     // Cerrar archivo
     close_file(fd);
@@ -89,8 +99,7 @@ int _print_sec(char *sec) {
             return EXIT_FAILURE;
         case N_E_ENV:
             // Crear entorno si no existe
-            write(fd, sec, strlen(sec));
-            write(fd, "\n", sizeof(char));
+            _write_line(fd, sec);
             break;
         case EXIT_SUCCESS:
             // Si existe, mostrar su contenido
@@ -106,13 +115,15 @@ int _print_sec(char *sec) {
                     return EXIT_FAILURE;
                 }
                 // Imprimir variable o salir
-                if (check_field(buffer)) {
+                if (_check_field(buffer)) {
                     _print_entry(buffer, 2);
                 } else {
                     break;
                 }
             } while (ok != END_OF_FILE);
+            break;
         default:
+            close_file(fd);
             return EXIT_FAILURE;
     }
     // Cerrar archivo
@@ -144,9 +155,9 @@ int _print_var(char *sec, char *var) {
                     close_file(fd);
                     return EXIT_FAILURE;
                 }
-                if (check_field(buffer)) {
+                if (_check_field(buffer)) {
                     // Comprobar si es la variable buscada
-                    char tmp[BUFFER_SIZE];
+                    char tmp[strlen(var) + 2];
                     strcpy(tmp, var);
                     strcat(tmp, ">");
                     if (strstr(buffer, tmp) != NULL) {
@@ -157,7 +168,9 @@ int _print_var(char *sec, char *var) {
                     return EXIT_FAILURE; // No existe
                 }
             } while (ok != END_OF_FILE);
+            break;
         default:
+            close_file(fd);
             return EXIT_FAILURE;
     }
     // Cerrar archivo
@@ -190,15 +203,183 @@ int _find_env(int fd, char *env) {
  * @param field linea pasada.
  * @return 'true' (1) si es variable, 'false' (0) si es entorno.
  */
-int check_field(const char *field) {
-    char tmp[BUFFER_SIZE];
+int _check_field(const char *field) {
+    char tmp[strlen(field) + 1];
     strcpy(tmp, field);
     strtok(tmp, ">");
     return strtok(NULL, ">") != NULL;
 }
 
+/**
+ * Escribe una línea en un archivo.
+ * Añade \n al final de la línea.
+ * @param fd descriptor del archivo (abierto y bloqueado para escritura)
+ * @param line cadena de caracteres a escribir (acabada en \o)
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
+int _write_line(int fd, char *line) {
+    ssize_t ok;
+    write(fd, line, strlen(line));
+    ok = write(fd, "\n", sizeof(char));
+    return ok > 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+/**
+ * Modifica una variable del entorno o la añade si no existe.
+ * Si no existe el archivo de entorno lo crea.
+ * La sección tiene que existir.
+ * @param sec sección del entorno
+ * @param var variable de la sección
+ * @param val valor de la variable
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
 int modificar_entorno(char *sec, char *var, char *val) {
-    // TODO
-    //
-    return 0;
+    int fd, ok;
+    char buffer[BUFFER_SIZE];
+    // Abir archivos
+    if ((fd = open_file("entorno.dat", OF_CREAT | OF_RDWR)) == EXIT_FAILURE) { return EXIT_FAILURE; }
+    // Buscar sección
+    switch (_find_env(fd, sec)) {
+        case N_E_ENV:
+            perror("ERROR: No existe la sección.");
+        case EXIT_FAILURE:
+            close_file(fd);
+            return EXIT_FAILURE;
+        case EXIT_SUCCESS:
+            // Si existe, iterar sobre las variables
+            do {
+                if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
+                    close_file(fd);
+                    return EXIT_FAILURE;
+                }
+                if (_check_field(buffer)) {
+                    // Comprobar si es la variable buscada
+                    char tmp[strlen(var) + 2];
+                    strcpy(tmp, var);
+                    strcat(tmp, ">");
+                    if (strstr(buffer, tmp) != NULL) {
+                        // Si existe la variable -> modificar valor
+                        // Retroceder descriptor al inicio de la variable
+                        int line_length = (int) (strlen(buffer) + 1);
+                        lseek(fd, -(line_length), SEEK_CUR);
+                        _modify_var(fd, line_length, var, val);
+                        break;
+                    } else if (ok == END_OF_FILE) {
+                        // Si no existe la variable (se acaba el archivo) -> crearla
+                        _create_var(fd, var, val);
+                    }
+                } else {
+                    // Si no existe la variable (se pasa de sección) -> crearla
+                    // Retroceder descruptor al final de la sección
+                    lseek(fd, -(strlen(buffer) + 1), SEEK_CUR);
+                    _create_var(fd, var, val);
+                    break;
+                }
+            } while (ok != END_OF_FILE);
+            break;
+        default:
+            close_file(fd);
+            return EXIT_FAILURE;
+    }
+    // Cerrar archivo
+    close_file(fd);
+    return EXIT_SUCCESS;
+}
+
+/**
+ * Crea la variable en la sección indicada con el valor pasado.
+ * @param fd descriptor del archivo de entorno posicionado donde va la variable
+ * @param var variable a crear
+ * @param val valor de la variable
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
+int _create_var(int fd, char *var, char *val) {
+    // Nueva línea de la variable
+    char var_line[strlen(var) + strlen(val) + 2];
+    _create_var_line(var_line, var, val);
+    // Crear variable
+    return _modify_line(fd, 0, var_line);;
+}
+
+/**
+ * Modifica la variable de la sección indicada con el valor pasado.
+ * @param fd descriptor del archivo de entorno posicionado donde va la variable
+ * @param var variable a modificar
+ * @param val valor de la variable
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
+int _modify_var(int fd, int line_size, char *var, char *val) {
+    // Nueva línea de la variable
+    char var_line[strlen(var) + strlen(val) + 2];
+    _create_var_line(var_line, var, val);
+    // Modificar variable
+    return _modify_line(fd, line_size, var_line);;
+}
+
+/**
+ * Modifica una línea de una archivo sustituyéndola por new_line.
+ * Si line_size=0, la línea se añade como una nueva línea.
+ * La modificación se realiza en la posición indicada por fd.
+ * @param fd descriptor del archivo
+ * @param line_size tamaño de la línea existente a modificar (0 si nueva línea)
+ * @param new_line contenido de la nueva línea
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
+int _modify_line(int fd, int line_size, char *new_line) {
+    // Guardar posición inicial
+    off_t initial_pos = lseek(fd, 0, SEEK_CUR);
+    // Copiar archivo desde el final de la linea a modificar hasta el EOF en un archivo temporal
+    int fd_tmp;
+    if ((fd_tmp = open_file("tmp", OF_CREAT | OF_RDWR)) == EXIT_FAILURE) { return EXIT_FAILURE; }
+    lseek(fd, line_size, SEEK_CUR);
+    if (_copy_to_EOF(fd, fd_tmp) == EXIT_FAILURE) {
+        close(fd_tmp);
+        return EXIT_FAILURE;
+    }
+    // Añadir línea modificada
+    lseek(fd, initial_pos, SEEK_SET);
+    if (_write_line(fd, new_line) == EXIT_FAILURE) {
+        close(fd_tmp);
+        return EXIT_FAILURE;
+    }
+    // Copiar el contenido del archivo temporal a continuación
+    lseek(fd_tmp, 0, SEEK_SET);
+    if (_copy_to_EOF(fd_tmp, fd) == EXIT_FAILURE) {
+        close(fd_tmp);
+        return EXIT_FAILURE;
+    }
+    // Eliminar archivo temporal
+    close(fd_tmp);
+    unlink("tmp");
+    return EXIT_SUCCESS;
+}
+
+/**
+ * Copiar un archivo a otro desde la posición apuntada por fd_src hasta EOF.
+ * @param fd_src descriptor del archivo origen apuntando a la posición desde la que copiar
+ * @param fd_des descriptor del archivo destino apuntando a la posición a la que se desea copiar
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
+int _copy_to_EOF(int fd_src, int fd_des) {
+    char buffer[BUFFER_SIZE];
+    int ok;
+    do {
+        if ((ok = read_line(fd_src, buffer, BUFFER_SIZE)) == EXIT_FAILURE) { return EXIT_FAILURE; }
+        if (ok != EOF) {
+            _write_line(fd_des, buffer);
+        }
+    } while (ok != END_OF_FILE);
+    return EXIT_SUCCESS;
+}
+
+/**
+ * Concatena la variable y su valor con el formato del archivo de entorno.
+ * @param buffer donde escribir el resultado
+ * @param var variable
+ * @param val valor
+ */
+void _create_var_line(char *buffer, char *var, char *val) {
+    strcpy(buffer, var);
+    strcat(buffer, ">");
+    strcat(buffer, val);
 }

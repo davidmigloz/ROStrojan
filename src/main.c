@@ -52,11 +52,12 @@ int menu(int argc, char **argv) {
                         ret = ver_entorno(argv[2], NULL);
                     break;
                 case N_ARGS_DEF + 2:
-                    if (argv[2] != NULL)
+                    if (argv[2] != NULL && argv[3] != NULL)
                         ret = ver_entorno(argv[2], argv[3]);
                     break;
                 case N_ARGS_DEF + 3:
-
+                    if (argv[2] != NULL && argv[3] != NULL && argv[4] != NULL)
+                        ret = modificar_entorno(argv[2], argv[3], argv[4]);
                     break;
                 default:
                     ret = EXIT_FAILURE;

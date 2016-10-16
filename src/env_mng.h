@@ -29,7 +29,15 @@
  */
 int ver_entorno(char *sec, char *var);
 
+/**
+ * Modifica una variable del entorno o la añade si no existe.
+ * Si no existe el archivo de entorno lo crea.
+ * La sección tiene que existir.
+ * @param sec sección del entorno
+ * @param var variable de la sección
+ * @param val valor de la variable
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
 int modificar_entorno(char *sec, char *var, char *val);
-
 
 #endif
