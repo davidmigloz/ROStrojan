@@ -1,6 +1,7 @@
 #include "file_mng.h"
 #include "env_mng.h"
 #include "system_info.h"
+#include "help.h"
 
 #define N_ARGS_DEF 2
 
@@ -36,7 +37,7 @@ int menu(int argc, char **argv) {
             break;
         case 'd':
             if (argv[2] != NULL)
-                ver_directorio(argv[2]);
+                ret = ver_directorio(argv[2]);
             break;
         case 'a':
             if (argv[2] != NULL)
@@ -91,8 +92,10 @@ int menu(int argc, char **argv) {
             printf("Ip:\t%s\n", ver_ip());
             break;
         default:
-            //TODO: help();
-            return EXIT_FAILURE;
+            break;
+    }
+    if(ret == EXIT_FAILURE){
+        help(f_arg[1]);
     }
     return ret;
 }

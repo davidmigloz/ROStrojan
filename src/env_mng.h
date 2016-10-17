@@ -14,6 +14,7 @@
 
 //DEFINES
 #define N_E_ENV 2
+#define ENV_PATH "../entorno.dat"
 
 // PROTOTYPES
 

@@ -61,7 +61,7 @@ int ver_entorno(char *sec, char *var) {
 int _print_env() {
     int fd;
     // Abre el archivo
-    if ((fd = open_file("../entorno.dat", OF_CREAT | OF_READ)) == EXIT_FAILURE) { return EXIT_FAILURE; }
+    if ((fd = open_file(ENV_PATH, OF_CREAT | OF_READ)) == EXIT_FAILURE) { return EXIT_FAILURE; }
     char buffer[BUFFER_SIZE];
     printf("entorno.dat\n");
     int ok;
@@ -89,7 +89,7 @@ int _print_env() {
 int _print_sec(char *sec) {
     int fd;
     // Abre el archivo
-    if ((fd = open_file("../entorno.dat", OF_APPEND | OF_CREAT | OF_RDWR)) == EXIT_FAILURE) { return EXIT_FAILURE; }
+    if ((fd = open_file(ENV_PATH, OF_APPEND | OF_CREAT | OF_RDWR)) == EXIT_FAILURE) { return EXIT_FAILURE; }
     char buffer[BUFFER_SIZE];
     int ok;
     // Buscar sección
@@ -139,7 +139,7 @@ int _print_sec(char *sec) {
 int _print_var(char *sec, char *var) {
     int fd;
     // Abre el archivo
-    if ((fd = open_file("../entorno.dat", OF_CREAT | OF_READ)) == EXIT_FAILURE) { return EXIT_FAILURE; }
+    if ((fd = open_file(ENV_PATH, OF_CREAT | OF_READ)) == EXIT_FAILURE) { return EXIT_FAILURE; }
     char buffer[BUFFER_SIZE];
     int ok;
     // Buscar sección
@@ -234,7 +234,7 @@ int modificar_entorno(char *sec, char *var, char *val) {
     int fd, ok;
     char buffer[BUFFER_SIZE];
     // Abir archivos
-    if ((fd = open_file("../entorno.dat", OF_CREAT | OF_RDWR)) == EXIT_FAILURE) { return EXIT_FAILURE; }
+    if ((fd = open_file(ENV_PATH, OF_CREAT | OF_RDWR)) == EXIT_FAILURE) { return EXIT_FAILURE; }
     // Buscar sección
     switch (_find_env(fd, sec)) {
         case N_E_ENV:
