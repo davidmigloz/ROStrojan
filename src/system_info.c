@@ -157,13 +157,15 @@ char *_read_one_line_file(char *file, int max_length) {
  * Imprime el uid, grupo principal y directorio home del usuario pasado,
  * o de todos los usuarios del sistema si se pasa NULL.
  * @param uid nombre de usuario
+ * @return EXIT_SUCCESS o EXIT_FAILURE
  */
-void ver_usuario(char *uid) {
+int ver_usuario(char *uid) {
     if (uid == NULL) {
         _iterate_file(F_PASSWD);
     } else {
         _info_user(_get_line_by_id(uid, F_PASSWD));
     }
+    return EXIT_SUCCESS;
 }
 
 /**
@@ -196,13 +198,15 @@ void _print_user_info(char *uid, char *group, char *home_dir) {
  * Imprime el nombre, gid y miembros del grupo pasado,
  * o de todos los grupos del sistema si se pasa NULL.
  * @param gid id del grupo
+ * @return EXIT_SUCCESS o EXIT_FAILURE
  */
-void ver_grupo(char *gid) {
+int ver_grupo(char *gid) {
     if (gid == NULL) {
         _iterate_file(F_GROUP);
     } else {
         _info_group(_get_line_by_id(gid, F_GROUP));
     }
+    return EXIT_SUCCESS;
 }
 
 /**

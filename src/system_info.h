@@ -12,7 +12,6 @@
 // INCLUDES
 #include <unistd.h>
 #include <ctype.h>
-
 #include "file_mng.h"
 
 // CONSTANTS
@@ -64,14 +63,16 @@ char *ver_ip();
  * Imprime el uid, grupo principal y directorio home del usuario pasado,
  * o de todos los usuarios del sistema si se pasa NULL.
  * @param uid nombre de usuario
+ * @return EXIT_SUCCESS o EXIT_FAILURE
  */
-void ver_usuario(char *uid);
+int ver_usuario(char *uid);
 
 /**
  * Imprime el nombre, gid y miembros del grupo pasado,
  * o de todos los grupos del sistema si se pasa NULL.
  * @param gid id del grupo
+ * @return EXIT_SUCCESS o EXIT_FAILURE
  */
-void ver_grupo(char *gid);
+int ver_grupo(char *gid);
 
 #endif

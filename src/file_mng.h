@@ -68,11 +68,12 @@ int desbloqueo(int fd);
 
 /**
  * Abre un archivo y lo bloquea con el modo elegido.
- * Los modos permitidos son OF_READ y OF_WRITE por el momento.
+ * Los modos permitidos son OF_READ y OF_WRITE y OF_RDWR.
+ * Junto con los flags: OF_CREAT y OF_APPEND.
  * Ejemplos de uso: open_file("./Downloads/descarga1.txt", OF_READ);
  *                  open_file("/home/user/mitexto.txt", OF_WRITE);.
  * @param file puntero a la cadena de caracteres de la localizacion absoluta o relativa del archivo.
- * @param mode modo con el que abrir y bloquear: OF_READ o OF_WRITE.
+ * @param mode modo con el que abrir y bloquear: [flag] | (OF_READ | OF_WRITE OF_RDWR).
  * @return El descriptor de archivo del archivo abierto y bloqueado.
  */
 int open_file(const char *file, int mode);

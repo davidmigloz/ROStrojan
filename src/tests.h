@@ -5,12 +5,12 @@
  * Test suite para testear las librerías.
  * ****************************************************************************
  */
-
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #ifndef ROSTROJAN_TESTS_H
 #define ROSTROJAN_TESTS_H
 
 // INCLUDES
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,3 +25,4 @@
 void run_tests();
 
 #endif
+#pragma clang diagnostic pop

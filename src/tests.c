@@ -8,6 +8,8 @@
 
 #include "tests.h"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 // PRIVATE HEADERS
 void test_ver_directorio();
 
@@ -261,3 +263,4 @@ int ls_locks() {
     }
     return n_locks;
 }
+#pragma clang diagnostic pop
