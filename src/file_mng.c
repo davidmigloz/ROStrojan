@@ -66,7 +66,9 @@ int _iterate_dir(const char *dirPath, int depth) {
  * @param depth profundidad
  */
 void _print_entry(char *name, int depth) {
-    printf("%*s %s\n", depth * 2 + 1, "└", name);
+    if(strlen(name) > 0) {
+        printf("%*s %s\n", depth * 2 + 1, "└", name);
+    }
 }
 
 /*

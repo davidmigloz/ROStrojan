@@ -100,6 +100,7 @@ int _print_sec(char *sec) {
         case N_E_ENV:
             // Crear entorno si no existe
             _write_line(fd, sec);
+            _write_line(fd, "");
             break;
         case EXIT_SUCCESS:
             // Si existe, mostrar su contenido
@@ -364,6 +365,8 @@ int _copy_to_EOF(int fd_src, int fd_des) {
         if ((ok = read_line(fd_src, buffer, BUFFER_SIZE)) == EXIT_FAILURE) { return EXIT_FAILURE; }
         if (ok != EOF) {
             _write_line(fd_des, buffer);
+        } else {
+            _write_line(fd_des, "");
         }
     } while (ok != END_OF_FILE);
     return EXIT_SUCCESS;
