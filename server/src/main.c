@@ -9,7 +9,7 @@
 
 int main() {
     device devices[N_OF_DEVICES];
-    char* shm_address;
+    char *shm_address;
 
     shm_address = init_shm();
 
@@ -66,7 +66,7 @@ int main() {
 }
 
 
-int son_proccess(){
+int son_proccess() {
     /*Son does stuff*/
 
     /*Añadir cosas falsas*/
@@ -75,10 +75,9 @@ int son_proccess(){
 }
 
 
-
-int parent_proccess(){
+int parent_proccess() {
     /*Parent does stuff*/
-    while(1){
+    while (1) {
         /*Menu hasta que haya que cerrar*/
 
 
