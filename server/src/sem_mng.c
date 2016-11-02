@@ -31,12 +31,14 @@ int init_sem() {
         }
     }
 
-    // Nos aseguramos que el sistema sea capaz de limpiar esa estructura IPC cuando no haya procesos usandola
+    return sem_id;
+}
+
+int tear_sem(int sem_id){
     if (semctl(sem_id, IPC_RMID, NULL) == -1) {
         perror("SEM: semctl error\n");
         exit(EXIT_FAILURE);
     }
-    return;
 }
 
 int signal_sem(int sem_id){
@@ -56,3 +58,4 @@ int wait_sem(int sem_id){
     }
     return EXIT_SUCCESS;
 }
+
