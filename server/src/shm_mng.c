@@ -81,6 +81,7 @@ void set_n_of_devices(char *shm_pos, int n_of_devices) {
     (*(int *) (shm_pos)) = n_of_devices;
 }
 
+
 device get_n_device(char *shm_pos, int n) {
     return (device) *(device *) (shm_pos + sizeof(int) + sizeof(device) * n);
 }

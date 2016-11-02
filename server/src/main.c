@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <sys/sem.h>
-#include <unistd.h>
 #include "shm_mng.h"
 
 int main() {
@@ -20,30 +18,9 @@ int main() {
     printf("%d", i);
 
     tear_shm(shm_address);
-    /*
-    //Init semaphore
-    key_t sem_key;
-    int sem_id;
-    struct sembuf sem;
 
-    if ((sem_key = ftok( "/tmp/rostrojan", 's'))==(key_t)-1){
-        perror("ftok");
-        exit(EXIT_FAILURE);
-    }
-    if ((sem_id = semget(sem_key, 1,IPC_CREAT | IPC_EXCL ))==-1){
-        perror("semget error\n");
-        exit(EXIT_FAILURE);
-    }
-    else{
-        sem.sem_num = 0;
-        sem.sem_op = 1;
-        sem.sem_flg = 0;
-        if (semop(sem_id, &sem, 1) == -1) {
-            perror("semop error\n");
-            exit(EXIT_FAILURE);
-        }
-    }
-    //End semaphore init
+    /*
+
     //Start fork
     int pid;
     int son_exit;
