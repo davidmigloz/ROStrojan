@@ -11,20 +11,16 @@
 
 
 /**
- * Crea una estructura IPC y la añade a la memomria.
- * @return puntero a la memoria compartida.
+ * Crea un segmento de memoria compartida.
+ * @param shm_size tamaño del segmento de memoria compartida.
+ * @return identificador IPC del segmento de memoria compartida.
  */
-char *init_shm() {
-    int shm_size = sizeof(device) * N_OF_DEVICES + sizeof(int);
-
+int create_shm(size_t shm_size) {
     key_t mem_key;
     int shm_id;
-    char *shm_address;
-    /*
-     * hay que crear el '/tmp/rostrojan' si queremos hacerlo sobre /tmp/rostrojan
-     */
+
     // Conseguimos una estructura IPC quasi unica con ftok
-    if ((mem_key = ftok("/tmp", 'm')) == (key_t) - 1) {
+    if ((mem_key = ftok("/tmp/rostrojan/server/shm", 'm')) == -1) {
         perror("SHM: ftok error\n");
         exit(EXIT_FAILURE);
     }
@@ -34,58 +30,38 @@ char *init_shm() {
         perror("SHM: shmget error\n");
         exit(EXIT_FAILURE);
     }
+    return shm_id;
+}
 
-    // Añadimos esa memoria compartida a nuestro proceso
-    if ((shm_address = shmat(shm_id, NULL, 0)) == (char *) -1) {
+/**
+ * Mapeaa el segmento de memoria compartida al segmento de datos del proceso que llama a la función.
+ * @param shm_id identificador IPC del segmento de memoria compartida.
+ * @return dirección virtual del segmento de memoria compartida.
+ */
+char *attach_shm(int shm_id) {
+    char *shm_address = shmat(shm_id, 0, 0);
+    if (shm_address == (void *) -1) {
         perror("SHM: shmat error\n");
-        exit(EXIT_FAILURE);
-    }
-
-    // Nos aseguramos que el sistema sea capaz de limpiar esa estructura IPC cuando no haya procesos usandola
-    if (shmctl(shm_id, IPC_RMID, NULL) == -1) {
-        perror("SHM: shmctl error\n");
         exit(EXIT_FAILURE);
     }
     return shm_address;
 }
 
 /**
- * Quitamos la memoria compartida de nuestra aplicación.
- * @param shm_pos puntero a la memoria compartida.
+ * Separa el segmento de memoria compartida del segmento de datos del proceso.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int tear_shm(char *shm_pos) {
-    //Des-añadimos la memoria compartida de nuestro proceso
-    if (shmdt(shm_pos) == -1) {
-        perror("SHM: shmdt error\n");
-        exit(EXIT_FAILURE);
-    }
-    return EXIT_SUCCESS;
+int detach_shm(char *shm_address) {
+    return -shmdt(shm_address);
 }
 
 /**
- * Getter para el n_of_devices para que los usuarios de la biblioteca no tengan que conocer la implementacion.
- * @param shm_pos puntero a la memoria compartida.
- * @return número de dispositivos.
+ * QLiberar el espacio utilizado por el segmento de memoria compartida.
+ * @param shm_id identificador IPC del segmento de memoria compartida.
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int get_n_of_devices(char *shm_pos) {
-    return (int) *shm_pos;
-}
-
-/**
- * Setter para el n_of_devices para que los usuarios de la biblioteca no tengan que conocer la implementacion.
- * @param shm_pos puntero a la memoria compartida.
- * @param n_of_devices numero de dispositivos.
- */
-void set_n_of_devices(char *shm_pos, int n_of_devices) {
-    (*(int *) (shm_pos)) = n_of_devices;
-}
-
-
-device get_n_device(char *shm_pos, int n) {
-    return (device) *(device *) (shm_pos + sizeof(int) + sizeof(device) * n);
-}
-
-device *get_n_device_address(char *shm_pos, int n) {
-    return (device *) (shm_pos + sizeof(int) + sizeof(device) * n);
+int free_shm(int shm_id) {
+    struct shmid_ds shm_desc;
+    return -shmctl(shm_id, IPC_RMID, &shm_desc);
 }
