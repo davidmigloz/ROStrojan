@@ -21,14 +21,10 @@ int get_max_num_clients();
  */
 int main_process() {
     client_info devices[get_max_num_clients()];
-    int shm_id;
     char *shm_address;
 
-    // Crear segmento de memoria compartida
-    shm_id = create_shm(get_shm_size(get_max_num_clients()));
-
-    // Mapear segmento de memoria la proceso
-    shm_address = attach_shm(shm_id);
+    // Crear segmento de memoria compartida y mapearlo al segmento de memoria la proceso
+    shm_address = create_shm(get_shm_size(get_max_num_clients()));
 
     // Inicializar procesos hijo
     int listener_process_exit;
