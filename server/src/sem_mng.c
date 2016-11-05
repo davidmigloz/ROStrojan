@@ -2,86 +2,68 @@
  * ****************************************************************************
  * sem_mng.h
  *
- * Libreria para controlar el semaforo.
+ * Libreria para controlar el semáforo.
  * ****************************************************************************
  */
 
 #include "sem_mng.h"
 
 /**
- * Inicializa el semaforo
- * @return id de semaforo
+ * Crea un conjunto de semáforos con un semáforo inicializado a 1.
+ * @return identificador IPC del conjunto de semáforos.
  */
-int init_sem() {
+int create_sem() {
     key_t sem_key;
     int sem_id;
-    struct sembuf sem;
 
     // Pido key de estructura IPC a ftok
-    if ((sem_key = ftok( "/tmp", 's'))==(key_t)-1){
+    if ((sem_key = ftok("/tmp/rostrojan/server/sem", 's')) == -1) {
         perror("SEM: ftok error\n");
         exit(EXIT_FAILURE);
     }
 
-    // Pido un conjunto de semaforos nuevo con un semaforo
-    if ((sem_id = semget(sem_key, 1,IPC_CREAT | IPC_EXCL | 0600))==-1){
+    // Pido un conjunto de semáforos nuevo con un semáforo
+    if ((sem_id = semget(sem_key, 1, IPC_CREAT | IPC_EXCL | 0600)) == -1) {
         perror("SEM: semget error\n");
         exit(EXIT_FAILURE);
-    }else{
-        // Inicializo el semaforo a ser el 0 del array con 1 recurso sin NOWAIT para que tengan que esperar
-        sem.sem_num = 0;
-        sem.sem_op = 1;
-        sem.sem_flg = 0;
-        if (semop(sem_id, &sem, 1) == -1) {
-            perror("SEM: semop error\n");
-            exit(EXIT_FAILURE);
-        }
     }
 
+    // Inicializo el semáforo a 1
+    semctl(sem_id, SEM_INDEX, SETVAL, 1);
     return sem_id;
 }
 
 /**
- * Elimina el semaforo
- * @param sem_id id del semaforo
- * @return EXIT_SUCCESS o EXIT_FAILURE
+ * Elimina el conjunto de semáforos que contiene al semáforo.
+ * @param sem_id identificador IPC del conjunto de semáforos.
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int tear_sem(int sem_id){
-    // Elimino el semaforo
-    if (semctl(sem_id, IPC_RMID, NULL) == -1) {
-        perror("SEM: semctl error\n");
-        exit(EXIT_FAILURE);
-    }
-    return EXIT_SUCCESS;
+int delete_sem(int sem_id) {
+    // Elimino el semáforo
+    return semctl(sem_id, IPC_RMID, 0);
 }
 
 /**
- * Signal o V al semaforo
- * @param sem_id id del semaforo
- * @return EXIT_SUCCESS o EXIT_FAILURE
+ * Wait o P al semáforo.
+ * Decrementa el valor del semáforo, y se utiliza para adquirirlo o bloquearlo.
+ * Si el semáforo está bloqueado se bloquea el proceso hasta que el semáforo liberado.
+ * @param sem_id identificador IPC del conjunto de semáforos.
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int signal_sem(int sem_id){
-    // Incremento el semaforo en uno
-    struct sembuf sem_op = { 0, 1, NULL };
-    if((semop(sem_id, &sem_op, 1) == -1){
-        perror("SEM: semop signal error\n");
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
+int wait_sem(int sem_id) {
+    // Decremento el semáforo en uno
+    struct sembuf sem_op = {SEM_INDEX, -1, 0};
+    return semop(sem_id, &sem_op, 1);
 }
 
 /**
- * Wait o P al semaforo
- * @param sem_id id del semaforo
- * @return EXIT_SUCCESS o EXIT_FAILURE
+ * Signal o V al semáforo.
+ * Incrementa el valor del semáforo, y se utiliza para liberarlo o inicializarlo.
+ * @param sem_id identificador IPC del conjunto de semáforos.
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int wait_sem(int sem_id){
-    // Decremento el semaforo en uno
-    struct sembuf sem_op = { 0, -1, NULL };
-    if((semop(sem_id, &sem_op, 1) == -1){
-        perror("SEM: semop wait error\n");
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
+int signal_sem(int sem_id) {
+    // Incremento el semáforo en uno
+    struct sembuf sem_op = {SEM_INDEX, 1, 0};
+    return semop(sem_id, &sem_op, 1);
 }
-

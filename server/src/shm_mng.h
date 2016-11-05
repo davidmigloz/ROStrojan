@@ -14,55 +14,34 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// DEFINES
-#define N_OF_DEVICES 25
-#define NAMES_MAXLENGHT 100
-
-// STRUCTS
-typedef struct device device;
-struct device {
-    _Bool used;
-    int last_conn;
-    int id;
-    char name[NAMES_MAXLENGHT + 1];
-    char user[NAMES_MAXLENGHT + 1];
-    char ip[NAMES_MAXLENGHT + 1];
-    char kernel[NAMES_MAXLENGHT + 1];
-};
-
 // PROTOTYPES
 
 /**
- * Crea una estructura IPC y la añade a la memomria.
- * @return puntero a la memoria compartida.
+ * Crea un segmento de memoria compartida.
+ * @param shm_size tamaño del segmento de memoria compartida.
+ * @return identificador IPC del segmento de memoria compartida.
  */
-char* init_shm();
+int create_shm(size_t shm_size);
 
 /**
- * Getter para el n_of_devices para que los usuarios de la biblioteca no tengan que conocer la implementacion.
- * @param shm_pos puntero a la memoria compartida.
- * @return número de dispositivos.
+ * Mapeaa el segmento de memoria compartida al segmento de datos del proceso que llama a la función.
+ * @param shm_id identificador IPC del segmento de memoria compartida.
+ * @return dirección virtual del segmento de memoria compartida.
  */
-int get_n_of_devices(char* shm_pos);
-
-
-device get_n_device(char* shm_pos, int n);
-
-
-device* get_n_device_address(char* shm_pos, int n);
+char *attach_shm(int shm_id);
 
 /**
- * Setter para el n_of_devices para que los usuarios de la biblioteca no tengan que conocer la implementacion.
- * @param shm_pos puntero a la memoria compartida.
- * @param n_of_devices numero de dispositivos.
- */
-void set_n_of_devices(char* shm_pos, int n_of_devices);
-
-/**
- * Quitamos la memoria compartida de nuestra aplicación.
- * @param shm_pos puntero a la memoria compartida.
+ * Separa el segmento de memoria compartida del segmento de datos del proceso.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int tear_shm(char* shm_pos);
+int detach_shm(char *shm_address);
+
+/**
+ * QLiberar el espacio utilizado por el segmento de memoria compartida.
+ * @param shm_id identificador IPC del segmento de memoria compartida.
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
+ */
+int free_shm(int shm_id);
 
 #endif
