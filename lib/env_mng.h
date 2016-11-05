@@ -14,7 +14,7 @@
 
 //DEFINES
 #define N_E_ENV 2
-#define ENV_PATH "../entorno.dat"
+#define ENV_PATH "./entorno.dat"
 
 // PROTOTYPES
 
@@ -40,5 +40,14 @@ int ver_entorno(char *sec, char *var);
  * @return EXIT_SUCCESS o EXIT_FAILURE
  */
 int modificar_entorno(char *sec, char *var, char *val);
+
+/**
+ * Busca una variable de una sección y devuelve un string con su valor.
+ * Si no existe el fichero entorno.dat, lo crea.
+ * @param sec sección del entorno
+ * @param var variable de la sección
+ * @return string con el valor o string vacio si no existe.
+ */
+char *get_var_value(char *sec, char *var);
 
 #endif

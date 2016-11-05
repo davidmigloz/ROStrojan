@@ -12,9 +12,15 @@
 #define SERVER_MAIN_PROCESS_H
 
 // INCLUDES
+#include <unistd.h>
 #include "shm_utils.h"
 #include "listener_process.h"
-#include <unistd.h>
+#include "../../lib/env_mng.h"
+
+// DEFINES
+#define CONECTIONS_SECTION "CONECTIONS"
+#define MAX_NUM_CLIENTS_VAR "max_num_clients"
+#define MAX_NUM_CLIENTS 25
 
 // PROTOTYPES
 

@@ -14,6 +14,8 @@ int _print_sec(char *sec);
 
 int _print_var(char *sec, char *var);
 
+char *_parse_value(char *line);
+
 int _find_env(int fd, char *env);
 
 int _check_field(const char *field);
@@ -100,6 +102,7 @@ int _print_sec(char *sec) {
         case N_E_ENV:
             // Crear entorno si no existe
             _write_line(fd, sec);
+            _write_line(fd, "\n");
             break;
         case EXIT_SUCCESS:
             // Si existe, mostrar su contenido
@@ -137,42 +140,73 @@ int _print_sec(char *sec) {
  * @return EXIT_SUCCESS o EXIT_FAILURE
  */
 int _print_var(char *sec, char *var) {
+    char* val = get_var_value(sec, var);
+    if(strlen(val) == 0) {
+        return EXIT_FAILURE;
+    }
+    printf("%3s %s>%s\n", "└", var, val);
+    return EXIT_SUCCESS;
+}
+
+/**
+ * Busca una variable de una sección y devuelve un string con su valor.
+ * Si no existe el fichero entorno.dat, lo crea.
+ * @return string con el valor o string vacio si no existe.
+ */
+char *get_var_value(char *sec, char *var) {
     int fd;
     // Abre el archivo
-    if ((fd = open_file(ENV_PATH, OF_CREAT | OF_READ)) == EXIT_FAILURE) { return EXIT_FAILURE; }
-    char buffer[BUFFER_SIZE];
+    if ((fd = open_file(ENV_PATH, OF_CREAT | OF_READ)) == EXIT_FAILURE) { return ""; }
+    char *buffer = malloc(BUFFER_SIZE);
     int ok;
     // Buscar sección
     switch (_find_env(fd, sec)) {
         case EXIT_FAILURE:
         case N_E_ENV:
             close_file(fd);
-            return EXIT_FAILURE;
+            return "";
         case EXIT_SUCCESS:
             // Si existe, iterar sobre las variables
             do {
                 if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
                     close_file(fd);
-                    return EXIT_FAILURE;
+                    return "";
                 }
                 if (_check_field(buffer)) {
                     // Comprobar si es la variable buscada
                     if (strncmp(var, buffer, strlen(var)) == 0) {
-                        _print_entry(buffer, 1);
+                        // Si es, termina
                         break;
                     }
                 } else {
-                    return EXIT_FAILURE; // No existe
+                    return ""; // No existe
                 }
             } while (ok != END_OF_FILE);
             break;
         default:
             close_file(fd);
-            return EXIT_FAILURE;
+            return "";
     }
+    // Parsear linea
+    char *val = _parse_value(buffer);
     // Cerrar archivo
     close_file(fd);
-    return EXIT_SUCCESS;
+    free(buffer);
+    return val;
+}
+
+/**
+ * Obtiene el valor de una variable de una línea del fichero de entorno.
+ * @param line línea del fichero de entorno.
+ * @return string con el valor.
+ */
+char *_parse_value(char *line) {
+    char *tmp = malloc(BUFFER_SIZE);
+    strcpy(tmp, line);
+    // Obtener el valor de la variable
+    char *value = strtok(tmp, ">");
+    value = strtok(NULL, ">");
+    return value;
 }
 
 /**
