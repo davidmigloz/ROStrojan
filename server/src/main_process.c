@@ -12,19 +12,30 @@
 
 // PRIVATE HEADERS
 
-int get_max_num_clients();
+int _get_max_num_clients();
+
+int _create_tmp_dirs();
+
+int _delete_tmp_dirs();
 
 /**
  * Lógica del proceso principal.
  * Inicializa el segmento de memoria compartida y crea los procesos hijo.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int main_process() {
-    client_info devices[get_max_num_clients()];
-    char *shm_address;
+int main_process(int argc, char **argv) {
+    // Leer número máximo de clientes
+    int max_num_clients = _get_max_num_clients();
+
+    // Crear archivos temporales
+    if (_create_tmp_dirs() == -1) {
+        perror("create tmp dirs error\n");
+        exit(EXIT_FAILURE);
+    }
 
     // Crear segmento de memoria compartida y mapearlo al segmento de memoria la proceso
-    shm_address = create_shm(get_shm_size(get_max_num_clients()));
+    size_t shm_size = get_shm_size(max_num_clients);
+    char *shm_address = create_shm(shm_size);
 
     // Inicializar procesos hijo
     int listener_process_exit;
@@ -51,7 +62,7 @@ int main_process() {
  * Si el valor leído es mayor que MAX_NUM_CLIENTS, el val
  * @return
  */
-int get_max_num_clients() {
+int _get_max_num_clients() {
     int max_num_clients;
 
     // Leer archivo de entorno
@@ -76,4 +87,23 @@ int get_max_num_clients() {
         }
     }
     return max_num_clients;
+}
+
+/**
+ * Crea los directorios temporales utilizados en la memoria compartida y el semáforo.
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
+ */
+int _create_tmp_dirs() {
+    // Crear directorios
+    char mkdirs[PATH_MAX];
+    sprintf(mkdirs, "mkdir -p %s %s", TMP_FILE_SHM, TMP_FILE_SEM);
+    return system(mkdirs);
+}
+
+/**
+ * Elimina los directorios temporales utilizados en la memoria compartida y el semáforo.
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
+ */
+int _delete_tmp_dirs() {
+    return system("rm -rf /tmp/rostrojan/");
 }

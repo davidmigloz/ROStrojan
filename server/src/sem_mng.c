@@ -17,7 +17,7 @@ int create_sem() {
     int sem_id;
 
     // Pido key de estructura IPC a ftok
-    if ((sem_key = ftok("/tmp/rostrojan/server/sem", 's')) == -1) {
+    if ((sem_key = ftok(TMP_FILE_SEM, 's')) == -1) {
         perror("SEM: ftok error\n");
         exit(EXIT_FAILURE);
     }

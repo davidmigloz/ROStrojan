@@ -1,5 +1,5 @@
 #include "main_process.h"
 
-int main() {
-    return main_process();
+int main(int argc, char **argv) {
+    return main_process(argc, argv);
 }

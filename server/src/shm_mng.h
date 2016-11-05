@@ -14,6 +14,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// DEFINES
+#define TMP_FILE_SHM "/tmp/rostrojan/server/shm"
+
 // PROTOTYPES
 
 /**

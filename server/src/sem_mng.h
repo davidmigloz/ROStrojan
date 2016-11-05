@@ -17,6 +17,7 @@
 
 // DEFINES
 #define SEM_INDEX 0
+#define TMP_FILE_SEM "/tmp/rostrojan/server/sem"
 
 // PROTOTYPES
 

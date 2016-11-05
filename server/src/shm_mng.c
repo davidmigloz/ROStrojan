@@ -18,7 +18,7 @@ char *create_shm(size_t shm_size) {
     char *shm_address;
 
     // Conseguimos una estructura IPC quasi unica con ftok
-    if ((mem_key = ftok("/tmp/rostrojan/server/shm", 'm')) == -1) {
+    if ((mem_key = ftok(TMP_FILE_SHM, 'm')) == -1) {
         perror("SHM: ftok error\n");
         exit(EXIT_FAILURE);
     }
