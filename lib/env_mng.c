@@ -164,12 +164,14 @@ char *get_var_value(char *sec, char *var) {
         case EXIT_FAILURE:
         case N_E_ENV:
             close_file(fd);
+            free(buffer);
             return "";
         case EXIT_SUCCESS:
             // Si existe, iterar sobre las variables
             do {
                 if ((ok = read_line(fd, buffer, BUFFER_SIZE)) == EXIT_FAILURE) {
                     close_file(fd);
+                    free(buffer);
                     return "";
                 }
                 if (_check_field(buffer)) {
@@ -179,12 +181,14 @@ char *get_var_value(char *sec, char *var) {
                         break;
                     }
                 } else {
+                    free(buffer);
                     return ""; // No existe
                 }
             } while (ok != END_OF_FILE);
             break;
         default:
             close_file(fd);
+            free(buffer);
             return "";
     }
     // Parsear linea
