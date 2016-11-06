@@ -18,6 +18,10 @@ int _create_tmp_dirs();
 
 int _delete_tmp_dirs();
 
+void _menu_loop();
+
+void _print_menu();
+
 /**
  * Lógica del proceso principal.
  * Inicializa el segmento de memoria compartida y crea los procesos hijo.
@@ -51,10 +55,75 @@ int main_process(int argc, char **argv) {
     }
 
     // Escuchar órdenes de usuario
-    while (1) {
-        // TODO menú
-    }
+    _menu_loop();
+
+    // Cierre ordenado
+    //TODO
     return EXIT_SUCCESS;
+}
+
+/**
+ * Bucle del menú de usuario.
+ * El bucle termina cuando se selecciona la opción de cerrar.
+ */
+void _menu_loop() {
+    _Bool running = true;
+    int sel;
+    int c;
+    _print_menu();
+
+    while (running) {
+        printf("_____________________________________________\n"
+               "Seleccione una opción [1-5]...               \n");
+
+        // Leer opción introducida
+        sel = -1;
+        scanf("%d", &sel);
+        switch (sel) {
+            case 1:
+                // Número de equipos conectados
+                puts("1");
+                // TODO
+                break;
+            case 2:
+                // Número de espacios disponibles
+                puts("2");
+                // TODO
+                break;
+            case 3:
+                // Mostrar todos los clientes conectados
+                puts("3");
+                // TODO
+                break;
+            case 4:
+                // Mostrar información de un cliente
+                puts("4");
+                // TODO
+                break;
+            case 5:
+                // Cerrar
+                running = false;
+            default:
+                while ((c = getchar()) != '\n' && c != EOF) { } // Vaciar buffer
+                printf(" Selección inválida!!!\n");
+                _print_menu();
+                break;
+        }
+    }
+}
+
+/**
+ * Imprime el meú.
+ */
+void _print_menu() {
+    printf("=============================================\n"
+           "                   M E N Ú                   \n"
+           "=============================================\n"
+           "> 1: Número de equipos conectados            \n"
+           "> 2: Número de espacios disponibles          \n"
+           "> 3: Mostrar todos los clientes conectados   \n"
+           "> 4: Mostrar información de un cliente       \n"
+           "> 5: Cerrar                                  \n");
 }
 
 /**

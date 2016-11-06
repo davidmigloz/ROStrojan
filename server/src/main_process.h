@@ -13,6 +13,7 @@
 
 // INCLUDES
 #include <unistd.h>
+#include <stdbool.h>
 #include "shm_utils.h"
 #include "sem_mng.h"
 #include "listener_process.h"
