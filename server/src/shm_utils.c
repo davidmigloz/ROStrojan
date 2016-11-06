@@ -9,6 +9,8 @@
 
 #include "shm_utils.h"
 
+// TODO utilizar el semáforo cada vez que se acceda o modifique la shm
+
 /**
  * Devuelve el número de clientes conectados.
  * @param shm_address dirección virtual del segmento de memoria compartida.

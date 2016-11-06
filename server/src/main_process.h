@@ -31,6 +31,6 @@
  * Inicializa el segmento de memoria compartida y crea los procesos hijo.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int main_process(int argc, char **argv);
+int main_process();
 
 #endif

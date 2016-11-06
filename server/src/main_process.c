@@ -38,7 +38,7 @@ char *shm_address;
  * Inicializa el segmento de memoria compartida y crea los procesos hijo.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int main_process(int argc, char **argv) {
+int main_process() {
     // Leer número máximo de clientes
     int max_num_clients = _get_max_num_clients();
 
@@ -69,7 +69,9 @@ int main_process(int argc, char **argv) {
     _menu_loop();
 
     // Cierre ordenado
-    //TODO
+    //TODO Comunicar cierre al hijo y esperar a que termine
+    detach_shm(shm_address);
+    _delete_tmp_dirs();
     return EXIT_SUCCESS;
 }
 
