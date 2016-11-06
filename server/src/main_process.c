@@ -22,6 +22,11 @@ void _menu_loop();
 
 void _print_menu();
 
+void show_num_clients();
+
+// GLOBAL VARS
+char *shm_address;
+
 /**
  * Lógica del proceso principal.
  * Inicializa el segmento de memoria compartida y crea los procesos hijo.
@@ -39,7 +44,7 @@ int main_process(int argc, char **argv) {
 
     // Crear segmento de memoria compartida y mapearlo al segmento de memoria la proceso
     size_t shm_size = get_shm_size(max_num_clients);
-    char *shm_address = create_shm(shm_size);
+    shm_address = create_shm(shm_size);
 
     // Inicializar procesos hijo
     int listener_process_exit;
@@ -82,8 +87,7 @@ void _menu_loop() {
         switch (sel) {
             case 1:
                 // Número de equipos conectados
-                puts("1");
-                // TODO
+                show_num_clients();
                 break;
             case 2:
                 // Número de espacios disponibles
@@ -175,4 +179,11 @@ int _create_tmp_dirs() {
  */
 int _delete_tmp_dirs() {
     return system("rm -rf /tmp/rostrojan/");
+}
+
+/**
+ * Muestra el múmero de equipos conectados.
+ */
+void show_num_clients() {
+    printf("> Número de equipos conectados: %d\n\n", get_num_clients(shm_address));
 }
