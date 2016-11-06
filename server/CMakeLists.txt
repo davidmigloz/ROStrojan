@@ -15,7 +15,9 @@ set(SOURCE_FILES
         src/sem_mng.c
         src/sem_mng.h
         src/shm_utils.c
-        src/shm_utils.h)
+        src/shm_utils.h
+        src/sig_mng.c
+        src/sig_mng.h)
 
 set(LIB_FILES
         ../lib/file_mng.c

@@ -71,7 +71,7 @@ int main_process() {
     _menu_loop();
 
     // Cierre ordenado
-    kill(SIGUSR1, pid);
+    kill_pid(pid);
     detach_shm(shm_address);
     _delete_tmp_dirs();
     return EXIT_SUCCESS;
