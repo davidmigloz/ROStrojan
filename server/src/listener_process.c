@@ -17,7 +17,7 @@
  * Encargado recibir peticiones de conexión, desconexión y los datos de los clientes.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int listener_process() {
+int listener_process(int sem_id) {
     int end;
     if (bloq_signals()){
         perror("LIST: bloq_signals error\n");

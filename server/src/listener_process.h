@@ -23,6 +23,6 @@
  * Encargado recibir peticiones de conexión, desconexión y los datos de los clientes.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int listener_process();
+int listener_process(int sem_id);
 
 #endif

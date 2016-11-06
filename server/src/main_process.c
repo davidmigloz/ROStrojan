@@ -18,17 +18,17 @@ int _create_tmp_dirs();
 
 int _delete_tmp_dirs();
 
-void _menu_loop();
+void _menu_loop(int sem_id);
 
 void _print_menu();
 
-void _show_num_clients();
+void _show_num_clients(int sem_id);
 
-void _show_num_free_slots();
+void _show_num_free_slots(int sem_id);
 
-void _show_connected_clients();
+void _show_connected_clients(int sem_id);
 
-void _show_info_client();
+void _show_info_client(int sem_id);
 
 // GLOBAL VARS
 char *shm_address;
@@ -50,6 +50,8 @@ int main_process() {
         exit(EXIT_FAILURE);
     }
 
+    int sem_id = create_sem();
+
     // Crear segmento de memoria compartida y mapearlo al segmento de memoria la proceso
     size_t shm_size = get_shm_size(max_num_clients);
     shm_address = create_shm(shm_size);
@@ -68,7 +70,7 @@ int main_process() {
     }
 
     // Escuchar órdenes de usuario
-    _menu_loop();
+    _menu_loop(sem_id);
 
     // Cierre ordenado
     kill_pid(pid);
@@ -81,7 +83,7 @@ int main_process() {
  * Bucle del menú de usuario.
  * El bucle termina cuando se selecciona la opción de cerrar.
  */
-void _menu_loop() {
+void _menu_loop(int sem_id) {
     _Bool running = true;
     int sel;
     int c;
@@ -97,20 +99,20 @@ void _menu_loop() {
         switch (sel) {
             case 1:
                 // Número de equipos conectados
-                _show_num_clients();
+                _show_num_clients(sem_id);
                 break;
             case 2:
                 // Número de espacios disponibles
                 puts("2");
-                _show_num_free_slots();
+                _show_num_free_slots(sem_id);
                 break;
             case 3:
                 // Mostrar todos los clientes conectados
-                _show_connected_clients();
+                _show_connected_clients(sem_id);
                 break;
             case 4:
                 // Mostrar la información de un cliente
-                _show_info_client();
+                _show_info_client(sem_id);
                 break;
             case 5:
                 // Cerrar
@@ -193,25 +195,25 @@ int _delete_tmp_dirs() {
 /**
  * Muestra el múmero de equipos conectados.
  */
-void _show_num_clients() {
-    printf("> Número de equipos conectados: %d\n\n", get_num_clients(shm_address));
+void _show_num_clients(int sem_id) {
+    printf("> Número de equipos conectados: %d\n\n", get_num_clients(shm_address, sem_id));
 }
 
 /**
  * Muestra el número de espacios disponibles.
  */
-void _show_num_free_slots() {
-    int free_slots = _get_max_num_clients() - get_num_clients(shm_address);
+void _show_num_free_slots(int sem_id) {
+    int free_slots = _get_max_num_clients() - get_num_clients(shm_address, sem_id);
     printf("> Número de espacios disponibles: %d\n\n", free_slots);
 }
 
 /**
  * Muestra todos los clientes conectados.
  */
-void _show_connected_clients() {
+void _show_connected_clients(int sem_id) {
     printf("> Clientes conectados:\n");
     for (int i = 0; i < _get_max_num_clients(); i++) {
-        client_info info = get_client_info(shm_address, i);
+        client_info info = get_client_info(shm_address, i, sem_id);
         if (info.used) {
             printf("  %d. Cliente %s\n", i, info.name);
         }
@@ -222,7 +224,7 @@ void _show_connected_clients() {
 /**
  * Muestra la información de un cliente.
  */
-void _show_info_client() {
+void _show_info_client(int sem_id) {
     printf("> Introduzca el índice del cliente: ");
     // Leer índice
     int sel = -1;
@@ -232,7 +234,7 @@ void _show_info_client() {
         printf("Índice inválido!!!\n\n");
         return;
     }
-    client_info info = get_client_info(shm_address, sel);
+    client_info info = get_client_info(shm_address, sel, sem_id);
     if (!info.used) {
         printf("El índice no se encuentra en uso.\n\n");
         return;

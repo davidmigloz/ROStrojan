@@ -11,6 +11,7 @@
 #define SERVER_SHM_UTILS_H
 
 // INCLUDES
+#include "sem_mng.h"
 #include "shm_mng.h"
 
 // DEFINES
@@ -35,21 +36,21 @@ struct client_info {
  * @param shm_address dirección virtual del segmento de memoria compartida.
  * @return número de clientes conectados.
  */
-int get_num_clients(char *shm_address);
+int get_num_clients(char *shm_address, int sem_id);
 
 /**
  * Incrementa una unidad el número de clientes conectados.
  * @param shm_address dirección virtual del segmento de memoria compartida.
  * @return número de clientes conectados.
  */
-int incr_num_clients(char *shm_address);
+int incr_num_clients(char *shm_address, int sem_id);
 
 /**
  * Decrementa una unidad el número de clientes conectados.
  * @param shm_address dirección virtual del segmento de memoria compartida.
  * @return número de clientes conectados.
  */
-int decr_num_clients(char *shm_address);
+int decr_num_clients(char *shm_address, int sem_id);
 
 /**
  * Devuelve la información del cliente almacenado en la posicón pasada.
@@ -57,7 +58,7 @@ int decr_num_clients(char *shm_address);
  * @param n índice del cliente.
  * @return información del cliente.
  */
-client_info get_client_info(char *shm_address, int n);
+client_info get_client_info(char *shm_address, int n, int sem_id);
 
 /**
  * Devuelve el tamaño que tiene que tener el segmento de memoria compartida para almacenar información el número
