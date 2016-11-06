@@ -28,6 +28,8 @@ void _show_num_free_slots();
 
 void _show_connected_clients();
 
+void _show_info_client();
+
 // GLOBAL VARS
 char *shm_address;
 
@@ -82,8 +84,8 @@ void _menu_loop() {
     _print_menu();
 
     while (running) {
-        printf("_____________________________________________\n"
-               "Seleccione una opción [1-5]...               \n");
+        printf("_____________________________________________\n");
+        printf("Seleccione una opción [1-5]...               \n");
 
         // Leer opción introducida
         sel = -1;
@@ -103,15 +105,14 @@ void _menu_loop() {
                 _show_connected_clients();
                 break;
             case 4:
-                // Mostrar información de un cliente
-                puts("4");
-                // TODO
+                // Mostrar la información de un cliente
+                _show_info_client();
                 break;
             case 5:
                 // Cerrar
                 running = false;
             default:
-                while ((c = getchar()) != '\n' && c != EOF) { } // Vaciar buffer
+                while ((c = getchar()) != '\n' && c != EOF) {} // Vaciar buffer
                 printf(" Selección inválida!!!\n");
                 _print_menu();
                 break;
@@ -123,14 +124,14 @@ void _menu_loop() {
  * Imprime el meú.
  */
 void _print_menu() {
-    printf("=============================================\n"
-           "                   M E N Ú                   \n"
-           "=============================================\n"
-           "> 1: Número de equipos conectados            \n"
-           "> 2: Número de espacios disponibles          \n"
-           "> 3: Mostrar todos los clientes conectados   \n"
-           "> 4: Mostrar información de un cliente       \n"
-           "> 5: Cerrar                                  \n");
+    printf("=============================================\n");
+    printf("                   M E N Ú                   \n");
+    printf("=============================================\n");
+    printf("> 1: Número de equipos conectados            \n");
+    printf("> 2: Número de espacios disponibles          \n");
+    printf("> 3: Mostrar todos los clientes conectados   \n");
+    printf("> 4: Mostrar la información de un cliente    \n");
+    printf("> 5: Cerrar                                  \n");
 }
 
 /**
@@ -204,11 +205,39 @@ void _show_num_free_slots() {
  */
 void _show_connected_clients() {
     printf("> Clientes conectados:\n");
-    for(int i = 0; i < _get_max_num_clients(); i++) {
+    for (int i = 0; i < _get_max_num_clients(); i++) {
         client_info info = get_client_info(shm_address, i);
-        if(info.used) {
-            printf("  %d. Cliente %s\n", i, info.ip);
+        if (info.used) {
+            printf("  %d. Cliente %s\n", i, info.name);
         }
     }
     printf("\n");
+}
+
+/**
+ * Muestra la información de un cliente.
+ */
+void _show_info_client() {
+    printf("> Introduzca el índice del cliente: ");
+    // Leer índice
+    int sel = -1;
+    scanf("%d", &sel);
+    // Validar índice
+    if (sel < 0 || sel >= _get_max_num_clients()) {
+        printf("Índice inválido!!!\n\n");
+        return;
+    }
+    client_info info = get_client_info(shm_address, sel);
+    if (!info.used) {
+        printf("El índice no se encuentra en uso.\n\n");
+        return;
+    }
+    // Mostrar info
+    printf("> Información del cliente:\n");
+    printf("  -ID:\t%d\n", info.id);
+    printf("  -NAME:\t%s\n", info.name);
+    printf("  -USER:\t%s\n", info.user);
+    printf("  -IP:\t%s\n", info.ip);
+    printf("  -KERNEL:\t%s\n", info.kernel);
+    printf("  -LAST CONN:\t%i\n\n", info.last_conn);
 }
