@@ -14,6 +14,7 @@
 
 // INCLUDES
 #include <stdlib.h>
+#include "sig_mng.h"
 
 // PROTOTYPES
 

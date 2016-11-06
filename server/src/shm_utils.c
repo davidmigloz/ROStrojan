@@ -49,6 +49,7 @@ client_info get_client_info(char *shm_address, int n) {
     return client_info[n];
 }
 
+
 // TODO add_client_info: busca posición libre y añade la información del nuevota cliente
 // TODO delete_cliente_info: marca una posición como libre.
 

@@ -22,6 +22,6 @@ set(LIB_FILES
         ../lib/file_mng.h
         ../lib/env_mng.c
         ../lib/env_mng.h
-         )
+        src/sig_mng.c src/sig_mng.h)
 
 add_executable(Server ${SOURCE_FILES} ${LIB_FILES})
