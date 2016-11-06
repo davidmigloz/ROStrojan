@@ -113,6 +113,7 @@ void _menu_loop() {
             case 5:
                 // Cerrar
                 running = false;
+                break;
             default:
                 while ((c = getchar()) != '\n' && c != EOF) {} // Vaciar buffer
                 printf(" Selección inválida!!!\n");
@@ -134,7 +135,6 @@ void _print_menu() {
     printf("> 3: Mostrar todos los clientes conectados   \n");
     printf("> 4: Mostrar la información de un cliente    \n");
     printf("> 5: Cerrar                                  \n");
-    printf("=============================================\n");
 }
 
 /**
