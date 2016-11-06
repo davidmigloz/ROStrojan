@@ -13,10 +13,8 @@
 #define SERVER_LISTENER_PROCESS_H
 
 // INCLUDES
-#include <stdlib.h>
+#include "sig_mng.h"
 #include <signal.h>
-#include <stdio.h>
-#include <unistd.h>
 
 // PROTOTYPES
 
