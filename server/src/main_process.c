@@ -134,6 +134,7 @@ void _print_menu() {
     printf("> 3: Mostrar todos los clientes conectados   \n");
     printf("> 4: Mostrar la información de un cliente    \n");
     printf("> 5: Cerrar                                  \n");
+    printf("=============================================\n");
 }
 
 /**
