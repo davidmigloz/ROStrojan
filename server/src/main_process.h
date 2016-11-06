@@ -18,6 +18,8 @@
 #include "sem_mng.h"
 #include "listener_process.h"
 #include "../../lib/env_mng.h"
+#include <signal.h>
+
 
 // DEFINES
 #define CONECTIONS_SECTION "CONECTIONS"

@@ -41,6 +41,8 @@ char *shm_address;
 int main_process() {
     // Leer número máximo de clientes
     int max_num_clients = _get_max_num_clients();
+    // Para que el padre conozca el pid del hijo
+    pid_t pid;
 
     // Crear archivos temporales
     if (_create_tmp_dirs() == -1) {
@@ -54,7 +56,7 @@ int main_process() {
 
     // Inicializar procesos hijo
     int listener_process_exit;
-    switch (fork()) {
+    switch (pid =fork()) {
         case -1: // Error
             perror("fork error\n");
             exit(EXIT_FAILURE);
@@ -69,7 +71,7 @@ int main_process() {
     _menu_loop();
 
     // Cierre ordenado
-    //TODO Comunicar cierre al hijo y esperar a que termine
+    kill(SIGUSR1, pid);
     detach_shm(shm_address);
     _delete_tmp_dirs();
     return EXIT_SUCCESS;

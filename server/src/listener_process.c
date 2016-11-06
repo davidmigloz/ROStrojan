@@ -8,7 +8,19 @@
  * *En esta entrega será simulado.
  * ****************************************************************************
  */
+
 #include "listener_process.h"
+
+
+void _handler(int signum);
+int set_handler();
+
+
+/* If this flag is nonzero, don't handle the signal right away. */
+volatile sig_atomic_t signal_pending = 0;
+
+/* This is nonzero if a signal arrived and was not handled. */
+volatile sig_atomic_t ignore_signal = 0;
 
 /**
  * Lógica del proceso listener.
@@ -16,22 +28,16 @@
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
 int listener_process() {
-    //set de señales que bloquear o desbloquear
-    sigset_t* sigset;
-    //llenamos el set de bloqueos
-    sigfillset(sigset);
-    while(1){
-        if (bloq_signals(sigset)){
-            perror("LIST: bloq_signals error\n");
-            exit(EXIT_FAILURE);
-        }
+    if (set_handler()==-1){
+        perror("LIST: set_handler error\n");
+    }
+
+    while(1) {
+        ignore_signal++;
         // TODO fill part of the shm
-        if (unbloq_signals(sigset)){
-            perror("LIST: unbloq_signals error\n");
-            exit(EXIT_FAILURE);
-        }
-        //comprobamos que no nos llegue la señal de salida
-        if(received_end()){
+        ignore_signal--;
+        if (ignore_signal == 0 && signal_pending != 0){
+            perror("YOU KILLED ME!");
             break;
         }
         sleep(20);
@@ -39,5 +45,26 @@ int listener_process() {
     return EXIT_SUCCESS;
 }
 
+int set_handler() {
+    struct sigaction action;
+    action.sa_handler = _handler;
+    sigfillset(&action.sa_mask);
+    action.sa_flags = 0;
+    if((sigaction(SIGUSR1, &action, NULL))==-1){
+        exit(EXIT_FAILURE);
+    }
+    return EXIT_SUCCESS;
+}
 
+void _handler(int signum)
+{
+    if (ignore_signal){
+        signal_pending = signum;
+    }
+    else
+    {
+        perror("YOU KILLED ME!");
+        exit(EXIT_SUCCESS);
+    }
+}
 
