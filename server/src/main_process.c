@@ -24,6 +24,8 @@ void _print_menu();
 
 void show_num_clients();
 
+void show_num_free_slots();
+
 // GLOBAL VARS
 char *shm_address;
 
@@ -92,7 +94,7 @@ void _menu_loop() {
             case 2:
                 // Número de espacios disponibles
                 puts("2");
-                // TODO
+                show_num_free_slots()
                 break;
             case 3:
                 // Mostrar todos los clientes conectados
@@ -186,4 +188,12 @@ int _delete_tmp_dirs() {
  */
 void show_num_clients() {
     printf("> Número de equipos conectados: %d\n\n", get_num_clients(shm_address));
+}
+
+/**
+ * Muestra el número de espacios disponibles.
+ */
+void show_num_free_slots() {
+    int free_slots = (int) (_get_max_num_clients - get_num_clients(shm_address));
+    printf("> Número de espacios disponibles: %d\n\n", free_slots);
 }
