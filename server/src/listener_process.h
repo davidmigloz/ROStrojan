@@ -14,7 +14,15 @@
 
 // INCLUDES
 #include <signal.h>
+#include <limits.h>
+#include <string.h>
 #include "sig_mng.h"
+#include "shm_utils.h"
+
+// DEFINES
+#define NUM_NAMES   20
+#define NUM_IPS     20
+#define NUM_KERNELS 20
 
 // PROTOTYPES
 

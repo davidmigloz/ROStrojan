@@ -21,8 +21,8 @@
 typedef struct client_info client_info;
 struct client_info {
     _Bool used;
-    int last_conn;
     int id;
+    int last_conn;
     char name[NAMES_MAXLENGHT + 1];
     char user[NAMES_MAXLENGHT + 1];
     char ip[NAMES_MAXLENGHT + 1];
