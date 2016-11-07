@@ -9,7 +9,8 @@
 
 #include "shm_utils.h"
 
-// TODO utilizar el semáforo cada vez que se acceda o modifique la shm
+
+int _search_empty_pos(char *shm_address);
 
 /**
  * Devuelve el número de clientes conectados.
@@ -69,21 +70,42 @@ client_info get_client_info(char *shm_address, int n, int sem_id) {
 }
 
 
-// TODO add_client_info: busca posición libre y añade la información del nuevo cliente
 
-int add_client_info(char *shm_address, client_info *client_info, int sem_id){
+/**
+ * Añade la informacion de cliente a una posicion libre.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @param client_inf
+ * @param sem_id semaforo para la memoria compartida.
+ * @return EXIT_SUCCESS o EXIT_FAILURE
+ */
+int add_client_info(char *shm_address, client_info *client_inf, int sem_id){
+    int pos;
+    struct client_info memory_client;
+    // TODO: si no quedan huecos libres falla
     wait_sem(sem_id);
     // Search empty pos
-
+    pos = _search_empty_pos(shm_address);
     // Fill pos
+    memory_client = *(client_info*)(shm_address + get_shm_size(pos));
+    memory_client = *client_inf;
+    signal_sem(sem_id);
     return EXIT_SUCCESS;
 }
 
-int search_empty_pos(char *shm_address){
-
+/**
+ * Busca una posicion libre en memoria, no para hasta encontrar posicion libre asi que hay que asegurarse de que hay una
+ * antes de llamar, tampoco pide el semaforo asi que lo deberia tener el proceso que lo llame.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @return n posicion libre en memoria
+ */
+int _search_empty_pos(char *shm_address){
+    int i = 0;
+    while(*(_Bool*)(shm_address + get_shm_size(i))){
+        i++;
+    }
+    return i;
 }
 
-// TODO code review: delete_cliente_info: marca una posición como libre.
 /**
  * Marca una posicion de la memoria como libre.
  * @param shm_address dirección virtual del segmento de memoria compartida.
