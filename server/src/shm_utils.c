@@ -28,34 +28,6 @@ int get_num_clients(char *shm_address, int sem_id) {
 }
 
 /**
- * Incrementa una unidad el número de clientes conectados.
- * @param shm_address dirección virtual del segmento de memoria compartida.
- * @param sem_id semaforo para la memoria compartida
- * @return número de clientes conectados.
- */
-int incr_num_clients(char *shm_address, int sem_id) {
-    int ret;
-    wait_sem(sem_id);
-    ret = ++(*shm_address);
-    signal_sem(sem_id);
-    return ret;
-}
-
-/**
- * Decrementa una unidad el número de clientes conectados.
- * @param shm_address dirección virtual del segmento de memoria compartida.
- * @param sem_id semaforo para la memoria compartida
- * @return número de clientes conectados.
- */
-int decr_num_clients(char *shm_address, int sem_id) {
-    int ret;
-    wait_sem(sem_id);
-    ret = --(*shm_address);
-    signal_sem(sem_id);
-    return ret;
-}
-
-/**
  * Devuelve la información del cliente almacenado en la posicón pasada.
  * @param shm_address dirección virtual del segmento de memoria compartida.
  * @param n índice del cliente.
@@ -63,7 +35,7 @@ int decr_num_clients(char *shm_address, int sem_id) {
  * @return información del cliente.
  */
 client_info get_client_info(char *shm_address, int n, int sem_id) {
-    struct client_info *client_info;
+    client_info *client_info;
     wait_sem(sem_id);
     client_info = (struct client_info *) ((void *) shm_address + sizeof(int));
     signal_sem(sem_id);
@@ -80,17 +52,21 @@ client_info get_client_info(char *shm_address, int n, int sem_id) {
  */
 int add_client_info(char *shm_address, client_info *client_inf, int max_num_clients, int sem_id) {
     int pos;
-    struct client_info *memory_client;
+    client_info *memory_client;
     wait_sem(sem_id);
-    // Buscar posición libre
-    pos = _search_empty_pos(shm_address, max_num_clients);
-    // Comprobar que hay
-    if (pos == -1) {
+    // Comprobar que hay posición libre
+    if (max_num_clients - ((int) *shm_address) == 0) {
+        signal_sem(sem_id);
         return EXIT_FAILURE;
     }
-    // Fill pos
+    // Buscar posición libre
+    pos = _search_empty_pos(shm_address, max_num_clients);
+    // Rellenar info
     memory_client = (struct client_info *) (shm_address + get_shm_size(pos));
     *memory_client = *client_inf;
+    memory_client->used = 1;
+    // Incrementar num clientes
+    ++(*shm_address);
     signal_sem(sem_id);
     return EXIT_SUCCESS;
 }
@@ -127,7 +103,12 @@ int delete_client_info(char *shm_address, int n, int sem_id) {
     struct client_info *client_info;
     wait_sem(sem_id);
     client_info = (struct client_info *) (shm_address + get_shm_size(n));
-    (*client_info).used = 0;
+    if ((*client_info).used == 1) {
+        // Marcar como libre
+        (*client_info).used = 0;
+        // Decrementar num clientes
+        --(*shm_address);
+    }
     signal_sem(sem_id);
     return EXIT_SUCCESS;
 }

@@ -15,6 +15,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <wait.h>
 
 //DEFINES
 #define SIGNAL_RECEIVED 1

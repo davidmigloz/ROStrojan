@@ -20,6 +20,7 @@
 #include "shm_utils.h"
 
 // DEFINES
+#define DELAY       1
 #define NUM_NAMES   20
 #define NUM_IPS     20
 #define NUM_KERNELS 20
@@ -34,6 +35,6 @@
  * @param max_num_clients número máximo de clientes.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int listener_process(int sem_id, char *shm_address, int max_num_clients)
+int listener_process(int sem_id, char *shm_address, int max_num_clients);
 
 #endif

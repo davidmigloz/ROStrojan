@@ -48,5 +48,6 @@ int kill_pid(pid_t pid) {
     if ((kill(pid, SIGUSR1)) == -1) {
         exit(EXIT_FAILURE);
     }
+    waitpid(pid, NULL, 0);
     return EXIT_SUCCESS;
 }

@@ -39,20 +39,6 @@ struct client_info {
 int get_num_clients(char *shm_address, int sem_id);
 
 /**
- * Incrementa una unidad el número de clientes conectados.
- * @param shm_address dirección virtual del segmento de memoria compartida.
- * @return número de clientes conectados.
- */
-int incr_num_clients(char *shm_address, int sem_id);
-
-/**
- * Decrementa una unidad el número de clientes conectados.
- * @param shm_address dirección virtual del segmento de memoria compartida.
- * @return número de clientes conectados.
- */
-int decr_num_clients(char *shm_address, int sem_id);
-
-/**
  * Devuelve la información del cliente almacenado en la posicón pasada.
  * @param shm_address dirección virtual del segmento de memoria compartida.
  * @param n índice del cliente.

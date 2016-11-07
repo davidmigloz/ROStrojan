@@ -73,8 +73,10 @@ int main_process() {
     _menu_loop(sem_id);
 
     // Cierre ordenado
+    puts("Terminando ordenadamente...");
     kill_pid(child_pid);
     detach_shm(shm_address);
+    delete_sem(sem_id);
     _delete_tmp_dirs();
     return EXIT_SUCCESS;
 }
@@ -91,7 +93,7 @@ void _menu_loop(int sem_id) {
 
     while (running) {
         printf("_____________________________________________\n");
-        printf("Seleccione una opción [1-5]...               \n");
+        printf("Seleccione una opción [1-5]: ");
 
         // Leer opción introducida
         sel = -1;
@@ -103,7 +105,6 @@ void _menu_loop(int sem_id) {
                 break;
             case 2:
                 // Número de espacios disponibles
-                puts("2");
                 _show_num_free_slots(sem_id);
                 break;
             case 3:
@@ -179,7 +180,7 @@ int _get_max_num_clients() {
  */
 int _create_tmp_dirs() {
     // Crear directorios
-    char mkdirs[PATH_MAX];
+    char mkdirs[2048];
     sprintf(mkdirs, "mkdir -p %s %s", TMP_FILE_SHM, TMP_FILE_SEM);
     return system(mkdirs);
 }
@@ -241,10 +242,10 @@ void _show_info_client(int sem_id) {
     }
     // Mostrar info
     printf("> Información del cliente:\n");
-    printf("  -ID:\t%d\n", info.id);
-    printf("  -NAME:\t%s\n", info.name);
-    printf("  -USER:\t%s\n", info.user);
-    printf("  -IP:\t%s\n", info.ip);
-    printf("  -KERNEL:\t%s\n", info.kernel);
+    printf("  -ID:\t\t\t%d\n", info.id);
+    printf("  -NAME:\t\t%s\n", info.name);
+    printf("  -USER:\t\t%s\n", info.user);
+    printf("  -IP:\t\t\t%s\n", info.ip);
+    printf("  -KERNEL:\t\t%s\n", info.kernel);
     printf("  -LAST CONN:\t%i\n\n", info.last_conn);
 }
