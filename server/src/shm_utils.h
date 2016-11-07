@@ -61,6 +61,16 @@ int decr_num_clients(char *shm_address, int sem_id);
 client_info get_client_info(char *shm_address, int n, int sem_id);
 
 /**
+ * Añade la informacion de cliente a una posicion libre.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @param client_inf información del cliente.
+ * @param max_num_clients número máximo de clientes.
+ * @param sem_id semaforo para la memoria compartida.
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
+ */
+int add_client_info(char *shm_address, client_info *client_inf, int max_num_clients, int sem_id);
+
+/**
  * Devuelve el tamaño que tiene que tener el segmento de memoria compartida para almacenar información el número
  * de clientes pasado.
  * @param num_clients número de clientes a almacenar información.

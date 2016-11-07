@@ -11,13 +11,14 @@
 
 #include "listener_process.h"
 
-
 /**
  * Lógica del proceso listener.
  * Encargado recibir peticiones de conexión, desconexión y los datos de los clientes.
+ * @param sem_id semaforo para la memoria compartida.
+ * @param max_num_clients número máximo de clientes.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int listener_process(int sem_id) {
+int listener_process(int sem_id, int max_num_clients) {
     int end;
     if (bloq_signals()){
         perror("LIST: bloq_signals error\n");
@@ -38,5 +39,3 @@ int listener_process(int sem_id) {
     }
     return EXIT_SUCCESS;
 }
-
-

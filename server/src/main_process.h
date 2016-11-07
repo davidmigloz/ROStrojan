@@ -14,12 +14,11 @@
 // INCLUDES
 #include <unistd.h>
 #include <stdbool.h>
+#include <signal.h>
 #include "shm_utils.h"
 #include "sem_mng.h"
 #include "listener_process.h"
 #include "../../lib/env_mng.h"
-#include <signal.h>
-
 
 // DEFINES
 #define CONECTIONS_SECTION "CONECTIONS"

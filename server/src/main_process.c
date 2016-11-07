@@ -41,8 +41,6 @@ char *shm_address;
 int main_process() {
     // Leer número máximo de clientes
     int max_num_clients = _get_max_num_clients();
-    // Para que el padre conozca el pid del hijo
-    pid_t pid;
 
     // Crear archivos temporales
     if (_create_tmp_dirs() == -1) {
@@ -50,6 +48,7 @@ int main_process() {
         exit(EXIT_FAILURE);
     }
 
+    // Crear semáforo
     int sem_id = create_sem();
 
     // Crear segmento de memoria compartida y mapearlo al segmento de memoria la proceso
@@ -57,13 +56,14 @@ int main_process() {
     shm_address = create_shm(shm_size);
 
     // Inicializar procesos hijo
+    pid_t child_pid;
     int listener_process_exit;
-    switch (pid =fork()) {
+    switch (child_pid = fork()) {
         case -1: // Error
             perror("fork error\n");
             exit(EXIT_FAILURE);
         case 0: // Child 1: listener process
-            listener_process_exit = listener_process();
+            listener_process_exit = listener_process(sem_id, max_num_clients);
             exit(listener_process_exit);
         default: // Parent
             break;
@@ -73,7 +73,7 @@ int main_process() {
     _menu_loop(sem_id);
 
     // Cierre ordenado
-    kill_pid(pid);
+    kill_pid(child_pid);
     detach_shm(shm_address);
     _delete_tmp_dirs();
     return EXIT_SUCCESS;

@@ -8,15 +8,15 @@
 
 #include "sig_mng.h"
 
-
 /**
- * Comprueba si la señal SIGUSR1 esta siendo bloqueada
- * @return EXIT_FAILURE o 0 (Ejecucion correcta, no esta siendo bloqueada) o 1 (Ejecucion correcta esta siendo bloqueada)
+ * Comprueba si la señal SIGUSR1 esta siendo bloqueada.
+ * @return EXIT_FAILURE o 0 (Ejecucion correcta, no esta siendo bloqueada)
+ * o 1 (Ejecucion correcta esta siendo bloqueada).
  */
-int received_end(){
-    //set de señales que recibimos
+int received_end() {
+    // Set de señales que recibimos
     sigset_t received_signals;
-    if(sigpending(&received_signals)==-1){
+    if (sigpending(&received_signals) == -1) {
         perror("sigpending error\n");
         exit(EXIT_FAILURE);
     }
@@ -25,14 +25,14 @@ int received_end(){
 
 /**
  * Bloqueamos todas las señales posibles.
- * @return EXIT_FAILURE o EXIT_SUCCESS
+ * @return EXIT_FAILURE o EXIT_SUCCESS.
  */
 int bloq_signals() {
-    //set de señales que bloquear o desbloquear
+    // Set de señales que bloquear o desbloquear
     sigset_t sigset;
-    //llenamos el set de bloqueos
+    // Llenamos el set de bloqueos
     sigfillset(&sigset);
-    // bloqueamos todas las señales de sigset
+    // Bloqueamos todas las señales de sigset
     if ((sigprocmask(SIG_BLOCK, &sigset, NULL) == -1)) {
         exit(EXIT_FAILURE);
     }
@@ -41,11 +41,11 @@ int bloq_signals() {
 
 /**
  * Manda la señal SIGUSR1 a el proceso del pid.
- * @param pid pid del proceso
- * @return EXIT_FAILURE o EXIT_SUCCESS
+ * @param pid pid del proceso.
+ * @return EXIT_FAILURE o EXIT_SUCCESS.
  */
-int kill_pid(pid_t pid){
-    if ((kill(pid, SIGUSR1))==-1){
+int kill_pid(pid_t pid) {
+    if ((kill(pid, SIGUSR1)) == -1) {
         exit(EXIT_FAILURE);
     }
     return EXIT_SUCCESS;
