@@ -120,8 +120,8 @@ int _search_empty_pos(char *shm_address, int max_num_clients) {
  * Marca una posicion de la memoria como libre.
  * @param shm_address dirección virtual del segmento de memoria compartida.
  * @param n índice del cliente.
- * @param sem_id semaforo para la memoria compartida
- * @return EXIT_SUCCESS
+ * @param sem_id semaforo para la memoria compartida.
+ * @return EXIT_SUCCESS.
  */
 int delete_client_info(char *shm_address, int n, int sem_id) {
     struct client_info *client_info;

@@ -63,7 +63,7 @@ int main_process() {
             perror("fork error\n");
             exit(EXIT_FAILURE);
         case 0: // Child 1: listener process
-            listener_process_exit = listener_process(sem_id, max_num_clients);
+            listener_process_exit = listener_process(sem_id, shm_address, max_num_clients);
             exit(listener_process_exit);
         default: // Parent
             break;

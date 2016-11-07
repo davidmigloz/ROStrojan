@@ -13,6 +13,10 @@
 
 // PRIVATE HEADERS
 
+client_info _random_client_info();
+
+void _free_shm_space(char *shm_address, int sem_id, int max_num_clients);
+
 long _random(long max);
 
 // GLOBAL VARS
@@ -34,24 +38,36 @@ const char *KERNELS[NUM_KERNELS] = {"Microsoft Windows v10.0", "Microsoft Window
  * Lógica del proceso listener.
  * Encargado recibir peticiones de conexión, desconexión y los datos de los clientes.
  * @param sem_id semaforo para la memoria compartida.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
  * @param max_num_clients número máximo de clientes.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int listener_process(int sem_id, int max_num_clients) {
+int listener_process(int sem_id, char *shm_address, int max_num_clients) {
     int end;
+    // Bloquear señales
     if (bloq_signals()) {
         perror("LIST: bloq_signals error\n");
         exit(EXIT_FAILURE);
     }
     while (1) {
-        // TODO fill part of the shm
-        //comprobamos que no nos llegue la señal de salida
+        // Generar datos aleatorios
+        client_info client_info = _random_client_info();
+
+        // Añadir info cliente
+        int ok = add_client_info(shm_address, &client_info, max_num_clients, sem_id);
+        if (ok == EXIT_FAILURE) {
+            // Liberar espacio
+            _free_shm_space(shm_address, sem_id, max_num_clients);
+            // Añadir info cliente de nuevo
+            add_client_info(shm_address, &client_info, max_num_clients, sem_id);
+        }
+
+        // Comprobamos si hay que terminar (si se ha recibido SIGUSR1)
         end = received_end();
         if (end == -1) {
             perror("LIST: received_end error\n");
             exit(EXIT_FAILURE);
-        }
-        if (end == SIGNAL_RECEIVED) {
+        } else if (end == SIGNAL_RECEIVED) {
             break;
         }
         sleep(3);
@@ -64,7 +80,7 @@ int listener_process(int sem_id, int max_num_clients) {
  * @return client_info·
  */
 client_info _random_client_info() {
-    struct client_info client_info;
+    client_info client_info;
     // Generar id
     client_info.id = (int) _random(1000);
     // Generar última conexión
@@ -87,6 +103,19 @@ client_info _random_client_info() {
     strcpy(kernel, KERNELS[_random(NUM_KERNELS - 1)]);
     client_info.kernel = kernel;
     return client_info;
+}
+
+/**
+ * Libera un número aleatorio de espacios en el segmento de memoria compartida.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @param sem_id semaforo para la memoria compartida.
+ * @param max_num_clients número máximo de clientes.
+ */
+void _free_shm_space(char *shm_address, int sem_id, int max_num_clients) {
+    int num_to_free = (int) _random(max_num_clients - 1);
+    for (int i = 0; i < num_to_free; ++i) {
+        delete_client_info(shm_address, (int) _random(max_num_clients - 1), sem_id);
+    }
 }
 
 /**
