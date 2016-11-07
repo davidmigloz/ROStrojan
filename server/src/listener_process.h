@@ -16,11 +16,12 @@
 #include <signal.h>
 #include <limits.h>
 #include <string.h>
+#include <stdbool.h>
 #include "sig_mng.h"
 #include "shm_utils.h"
 
 // DEFINES
-#define DELAY       1
+#define DELAY       5
 #define NUM_NAMES   20
 #define NUM_IPS     20
 #define NUM_KERNELS 20

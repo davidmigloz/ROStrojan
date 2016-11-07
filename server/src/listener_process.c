@@ -17,7 +17,7 @@ client_info _random_client_info();
 
 void _free_shm_space(char *shm_address, int sem_id, int max_num_clients);
 
-long _random(long max);
+int _random(int max);
 
 // GLOBAL VARS
 const char *NAMES[] = {"Aaron", "Audrey", "Warren", "Lisa", "Bradley", "Ruth", "Debra", "Alan", "Anna", "Joan",
@@ -43,13 +43,14 @@ const char *KERNELS[] = {"Microsoft Windows v10.0", "Microsoft Windows v8.1", "M
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
 int listener_process(int sem_id, char *shm_address, int max_num_clients) {
+    _Bool running = true;
     int end;
     // Bloquear señales
     if (bloq_signals()) {
         perror("LIST: bloq_signals error\n");
         exit(EXIT_FAILURE);
     }
-    while (1) {
+    while (running) {
         // Generar datos aleatorios
         client_info client_info = _random_client_info();
 
@@ -62,15 +63,21 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
             add_client_info(shm_address, &client_info, max_num_clients, sem_id);
         }
 
-        // Comprobamos si hay que terminar (si se ha recibido SIGUSR1)
-        end = received_end();
-        if (end == -1) {
-            perror("LIST: received_end error\n");
-            exit(EXIT_FAILURE);
-        } else if (end == SIGNAL_RECEIVED) {
-            break;
-        }
-        sleep(DELAY);
+        int i = 0;
+        do {
+            // Comprobamos si hay que terminar (si se ha recibido SIGUSR1)
+            end = received_end();
+            if (end == -1) {
+                perror("LIST: received_end error\n");
+                exit(EXIT_FAILURE);
+            } else if (end == SIGNAL_RECEIVED) {
+                running = false;
+                break;
+            }
+            // Dormimos el proceso
+            sleep(1);
+            i++;
+        } while (i <= DELAY);
     }
     return EXIT_SUCCESS;
 }
@@ -82,12 +89,12 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
 client_info _random_client_info() {
     client_info client_info;
     // Generar id
-    client_info.id = (int) _random(1000);
+    client_info.id = _random(1000);
     // Generar última conexión
-    client_info.last_conn = (int) _random(INT_MAX);
+    client_info.last_conn = _random(INT_MAX);
     // Generar nombre de usuario
     char username[255];
-    strcpy(username, NAMES[_random(NUM_NAMES - 1)]);
+    strcpy(username, NAMES[_random(NUM_NAMES)]);
     strcpy(client_info.user, username);
     // Generar nombre del pc
     char name[255];
@@ -96,11 +103,11 @@ client_info _random_client_info() {
     strcpy(client_info.name, name);
     // Generar IP
     char ip[255];
-    strcpy(ip, IPS[_random(NUM_IPS - 1)]);
+    strcpy(ip, IPS[_random(NUM_IPS)]);
     strcpy(client_info.ip, ip);
     // Generar Kernel
     char kernel[255];
-    strcpy(kernel, KERNELS[_random(NUM_KERNELS - 1)]);
+    strcpy(kernel, KERNELS[_random(NUM_KERNELS)]);
     strcpy(client_info.kernel, kernel);
     return client_info;
 }
@@ -112,27 +119,29 @@ client_info _random_client_info() {
  * @param max_num_clients número máximo de clientes.
  */
 void _free_shm_space(char *shm_address, int sem_id, int max_num_clients) {
-    int num_to_free = 1 + (int) _random(max_num_clients - 2);
+    int num_to_free = 1 + _random(max_num_clients - 1);
     for (int i = 0; i < num_to_free; ++i) {
-        delete_client_info(shm_address, (int) _random(max_num_clients - 1), sem_id);
+        delete_client_info(shm_address, _random(max_num_clients), sem_id);
     }
 }
 
 /**
- * Número aleatorio en el rango [0, max].
+ * Número aleatorio en el rango [0, max).
  * @param max límete superior.
  * @return número aleatorio.
  */
-long _random(long max) {
-    unsigned long num_bins = (unsigned long) max + 1,
-            num_rand = (unsigned long) RAND_MAX + 1,
-            bin_size = num_rand / num_bins,
-            defect = num_rand % num_bins;
-
-    long x;
-    do {
-        x = random();
-    } while (num_rand - defect <= (unsigned long) x);
-
-    return x / bin_size;
+int _random(int max) {
+    if ((max - 1) == RAND_MAX) {
+        return rand();
+    } else {
+        // Chop off all of the values that would cause skew...
+        long end = RAND_MAX / max; // truncate skew
+        end *= max;
+        // ... and ignore results from rand() that fall above that limit.
+        // (Worst case the loop condition should succeed 50% of the time,
+        // so we can expect to bail out of this loop pretty quickly.)
+        int r;
+        while ((r = rand()) >= end);
+        return (r % max);
+    }
 }

@@ -216,7 +216,7 @@ void _show_connected_clients(int sem_id) {
     for (int i = 0; i < _get_max_num_clients(); i++) {
         client_info info = get_client_info(shm_address, i, sem_id);
         if (info.used) {
-            printf("  %d. Cliente %s\n", i, info.name);
+            printf("  %d. %s\n", i, info.name);
         }
     }
     printf("\n");
