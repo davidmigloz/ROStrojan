@@ -114,6 +114,32 @@ int delete_client_info(char *shm_address, int n, int sem_id) {
 }
 
 /**
+ * Recorre los registros almacenados liberando aquellos con una antiguedad mayor que
+ * la indicadaa.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @param max_timestamp máxima antiguedad.
+ * @param max_num_clients número máximo de clientes.
+ * @param sem_id semaforo para la memoria compartida.
+ * @return
+ */
+int clean_old_records(char *shm_address, long max_timestamp, int max_num_clients, int sem_id) {
+    wait_sem(sem_id);
+    struct client_info *client_info;
+    // Buscar registros antiguos
+    client_info = (struct client_info *) ((void *) shm_address + sizeof(int));
+    for (int i = 0; i < max_num_clients; ++i) {
+        if (client_info[i].used == 1 && client_info[i].last_conn < max_timestamp) {
+            // Marcar como libre
+            (*client_info).used = 0;
+            // Decrementar num clientes
+            --(*shm_address);
+        }
+    }
+    signal_sem(sem_id);
+    return EXIT_SUCCESS;
+}
+
+/**
  * Devuelve el tamaño que tiene que tener el segmento de memoria compartida para almacenar información el número
  * de clientes pasado.
  * @param num_clients número de clientes a almacenar información.

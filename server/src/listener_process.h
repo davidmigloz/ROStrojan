@@ -3,7 +3,7 @@
  * listener_process.h
  *
  * Lógica del proceso listener.
- * Encargado recibir peticiones de conexión, desconexión y los datos de los
+ * Encargado de recibir peticiones de conexión, desconexión y los datos de los
  * clientes.
  * *En esta entrega será simulado.
  * ****************************************************************************

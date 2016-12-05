@@ -56,9 +56,9 @@ int main_process() {
     shm_address = create_shm(shm_size);
 
     // Inicializar procesos hijo
-    pid_t child_pid;
-    int listener_process_exit;
-    switch (child_pid = fork()) {
+    pid_t listener_process_pid, cleaner_process_pid;
+    int listener_process_exit, cleaner_process_exit;
+    switch (listener_process_pid = fork()) { // Create listener process
         case -1: // Error
             perror("fork error\n");
             exit(EXIT_FAILURE);
@@ -66,7 +66,16 @@ int main_process() {
             listener_process_exit = listener_process(sem_id, shm_address, max_num_clients);
             exit(listener_process_exit);
         default: // Parent
-            break;
+            switch (cleaner_process_pid = fork()) { // Create cleaner process
+                case -1: // Error
+                    perror("fork error\n");
+                    exit(EXIT_FAILURE);
+                case 0: // Child 2: cleaner process
+                    cleaner_process_exit = cleaner_process(sem_id, shm_address, max_num_clients);
+                    exit(cleaner_process_exit);
+                default: // Parent
+                    break;
+            }
     }
 
     // Escuchar órdenes de usuario
@@ -74,7 +83,8 @@ int main_process() {
 
     // Cierre ordenado
     puts("Terminando ordenadamente...");
-    kill_pid(child_pid);
+    kill_pid(listener_process_pid);
+    kill_pid(cleaner_process_pid);
     detach_shm(shm_address);
     delete_sem(sem_id);
     _delete_tmp_dirs();

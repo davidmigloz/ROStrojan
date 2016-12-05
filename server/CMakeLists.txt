@@ -10,6 +10,8 @@ set(SOURCE_FILES
         src/main_process.h
         src/listener_process.c
         src/listener_process.h
+        src/cleaner_process.c
+        src/cleaner_process.h
         src/shm_mng.c
         src/shm_mng.h
         src/sem_mng.c
