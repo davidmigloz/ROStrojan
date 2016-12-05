@@ -124,7 +124,7 @@ int delete_client_info(char *shm_address, int n, int sem_id) {
  */
 int clean_old_records(char *shm_address, long max_timestamp, int max_num_clients, int sem_id) {
     wait_sem(sem_id);
-    struct client_info *client_info;
+    client_info *client_info;
     // Buscar registros antiguos
     client_info = (struct client_info *) ((void *) shm_address + sizeof(int));
     for (int i = 0; i < max_num_clients; ++i) {

@@ -17,6 +17,7 @@
 #include <limits.h>
 #include <string.h>
 #include <stdbool.h>
+#include <netinet/in.h>
 #include "sig_mng.h"
 #include "shm_utils.h"
 
@@ -25,6 +26,8 @@
 #define NUM_NAMES   20
 #define NUM_IPS     20
 #define NUM_KERNELS 20
+#define PORT        7654
+#define BUFFER_SIZE 1024
 
 // PROTOTYPES
 
