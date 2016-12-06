@@ -18,7 +18,7 @@ int _create_tmp_dirs();
 
 int _delete_tmp_dirs();
 
-void _menu_loop(int sem_id);
+void _menu_loop(int pipe_fd[2], int sem_id);
 
 void _print_menu();
 
@@ -55,6 +55,14 @@ int main_process() {
     size_t shm_size = get_shm_size(max_num_clients);
     shm_address = create_shm(shm_size);
 
+    // Crear tuberia unidireccional sin nombre
+    int pipe_fd[2];
+    if(pipe(pipe_fd)==-1){
+        perror("Pipe error\n");
+        exit(EXIT_FAILURE);
+    }
+
+
     // Inicializar procesos hijo
     pid_t listener_process_pid, cleaner_process_pid;
     int listener_process_exit, cleaner_process_exit;
@@ -71,7 +79,7 @@ int main_process() {
                     perror("fork error\n");
                     exit(EXIT_FAILURE);
                 case 0: // Child 2: cleaner process
-                    cleaner_process_exit = cleaner_process(sem_id, shm_address, max_num_clients);
+                    cleaner_process_exit = cleaner_process(pipe_fd, sem_id, shm_address, max_num_clients);
                     exit(cleaner_process_exit);
                 default: // Parent
                     break;
@@ -79,12 +87,14 @@ int main_process() {
     }
 
     // Escuchar órdenes de usuario
-    _menu_loop(sem_id);
+    _menu_loop(pipe_fd, sem_id);
 
     // Cierre ordenado
     puts("Terminando ordenadamente...");
     kill_pid(listener_process_pid);
     kill_pid(cleaner_process_pid);
+    close(pipe_fd[0]);
+    close(pipe_fd[1]);
     detach_shm(shm_address);
     delete_sem(sem_id);
     _delete_tmp_dirs();
@@ -95,10 +105,11 @@ int main_process() {
  * Bucle del menú de usuario.
  * El bucle termina cuando se selecciona la opción de cerrar.
  */
-void _menu_loop(int sem_id) {
+void _menu_loop(int pipe_fd[2], int sem_id) {
     _Bool running = true;
     int sel;
     int c;
+    char car = 'c';
     _print_menu();
 
     while (running) {
@@ -134,6 +145,11 @@ void _menu_loop(int sem_id) {
                 printf(" Selección inválida!!!\n");
                 _print_menu();
                 break;
+        }
+        // Cada vez que seleccionemos una opcion mandamos un caracter por la pipe
+        if(write(pipe_fd[1], &car, sizeof(car))==-1){
+            perror("MAIN: write error\n");
+            perror("Trying to continue\n");
         }
     }
 }
