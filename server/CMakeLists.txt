@@ -17,15 +17,15 @@ set(SOURCE_FILES
         src/sem_mng.c
         src/sem_mng.h
         src/shm_utils.c
-        src/shm_utils.h
-        src/sig_mng.c
-        src/sig_mng.h)
+        src/shm_utils.h)
 
 set(LIB_FILES
         ../lib/file_mng.c
         ../lib/file_mng.h
         ../lib/env_mng.c
         ../lib/env_mng.h
+        ../lib/sig_mng.c
+        ../lib/sig_mng.h
         )
 
 add_executable(Server ${SOURCE_FILES} ${LIB_FILES})

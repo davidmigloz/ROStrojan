@@ -13,9 +13,10 @@
 // INCLUDES
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 #include "shm_utils.h"
 #include "sem_mng.h"
-#include "sig_mng.h"
+#include "../../lib/sig_mng.h"
 #include "../../lib/env_mng.h"
 
 // DEFINES

@@ -5,7 +5,6 @@
  * Lógica del proceso listener.
  * Encargado de recibir peticiones de conexión, desconexión y los datos de los
  * clientes.
- * *En esta entrega será simulado.
  * ****************************************************************************
  */
 
@@ -18,14 +17,11 @@
 #include <string.h>
 #include <stdbool.h>
 #include <netinet/in.h>
-#include "sig_mng.h"
+#include "../../lib/sig_mng.h"
 #include "shm_utils.h"
 
 // DEFINES
 #define DELAY       5
-#define NUM_NAMES   20
-#define NUM_IPS     20
-#define NUM_KERNELS 20
 #define PORT        7654
 #define BUFFER_SIZE 1024
 

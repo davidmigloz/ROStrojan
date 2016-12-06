@@ -7,7 +7,6 @@
  * ****************************************************************************
  */
 
-#include <stdbool.h>
 #include "cleaner_process.h"
 
 // PRIVATE HEADERS
@@ -27,7 +26,7 @@ int _clean(int sem_id, char *shm_address, int max_num_clients);
  */
 int cleaner_process(int pipe_fd[2], int sem_id, char *shm_address, int max_num_clients) {
     int end;
-    int running = true;
+    _Bool running = true;
     ssize_t read_bytes;
     char pipe_b;
 
@@ -69,6 +68,7 @@ int cleaner_process(int pipe_fd[2], int sem_id, char *shm_address, int max_num_c
 
     return EXIT_SUCCESS;
 }
+
 
 int _clean(int sem_id, char *shm_address, int max_num_clients) {
     // Obtener antigüedad máxima

@@ -1,11 +1,12 @@
 /*
- * ****************************************************************************
+ * ********************************************************************
  * main_process.c
  *
  * Logíca del proceso principal.
  * Encargado de la inicialización los recursos necesarios (procesos,
- * estructuras...), del menejo del menú y del cierre ordenado de los procesos.
- * ****************************************************************************
+ * estructuras...), del menejo del menú y del cierre ordenado de los
+ * procesos.
+ * ********************************************************************
  */
 
 #include "main_process.h"
@@ -35,7 +36,8 @@ char *shm_address;
 
 /**
  * Lógica del proceso principal.
- * Inicializa el segmento de memoria compartida y crea los procesos hijo.
+ * Inicializa el segmento de memoria compartida y crea los procesos
+ * hijo.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
 int main_process() {
@@ -51,7 +53,8 @@ int main_process() {
     // Crear semáforo
     int sem_id = create_sem();
 
-    // Crear segmento de memoria compartida y mapearlo al segmento de memoria la proceso
+    // Crear segmento de memoria compartida y mapearlo al segmento de
+    // memoria la proceso
     size_t shm_size = get_shm_size(max_num_clients);
     shm_address = create_shm(shm_size);
 
@@ -146,7 +149,8 @@ void _menu_loop(int pipe_fd[2], int sem_id) {
                 _print_menu();
                 break;
         }
-        // Cada vez que seleccionemos una opcion mandamos un caracter por la pipe
+        // Cada vez que seleccionemos una opcion mandamos un caracter
+        // por la pipe
         if(write(pipe_fd[1], &car, sizeof(car))==-1){
             perror("MAIN: write error\n");
             perror("Trying to continue\n");

@@ -1,12 +1,10 @@
 /*
- * ****************************************************************************
+ * ********************************************************************
  * listener_process.c
  *
  * Lógica del proceso listener.
- * Encargado de recibir peticiones de conexión, desconexión y los datos de los
- * clientes.
- * *En esta entrega será simulado.
- * ****************************************************************************
+ * Encargado de recibir paquetes y datos de los clientes.
+ * ********************************************************************
  */
 
 #include "listener_process.h"
@@ -41,10 +39,10 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
         exit(EXIT_FAILURE);
     }
 
-    memset((char *) &entrada, 0, sizeof(entrada));
+    memset((char *) &entrada, '0', sizeof(entrada));
     entrada.sin_family = AF_INET;
     entrada.sin_port = htons(PORT);
-    entrada.sin_addr.s_addr = htonl(INADDR_ANY);
+    entrada.sin_addr.s_addr = htonl(INADDR_ANY); // TODO es necesario el htonl?
 
     if( bind(descriptor , (struct sockaddr*)&entrada, sizeof(entrada) ) == -1) {
         perror("Error linking socket\n");
