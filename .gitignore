@@ -3,6 +3,7 @@
 
 /bin
 entorno.dat
+cmake-build-debug/
 
 ### C ###
 # Prerequisites
