@@ -63,6 +63,13 @@ int main_process() {
         exit(EXIT_FAILURE);
     }
 
+    // Crear socket
+    int socket_fd;
+    if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+        perror("Error creating socket\n");
+        exit(EXIT_FAILURE);
+    }
+
     // Inicializar procesos hijo
     pid_t listener_process_pid, cleaner_process_pid;
     int listener_process_exit, cleaner_process_exit;
@@ -71,7 +78,7 @@ int main_process() {
             perror("fork error\n");
             exit(EXIT_FAILURE);
         case 0: // Child 1: listener process
-            listener_process_exit = listener_process(sem_id, shm_address, max_num_clients);
+            listener_process_exit = listener_process(sem_id, shm_address, socket_fd, max_num_clients);
             exit(listener_process_exit);
         default: // Parent
             switch (cleaner_process_pid = fork()) { // Create cleaner process
@@ -91,9 +98,11 @@ int main_process() {
 
     // Cierre ordenado
     puts("Terminando ordenadamente...");
+    // Cerrar socket
+    shutdown(socket_fd, SHUT_RD);
     // Terminar procesos hijo
-    kill_pid(cleaner_process_pid);
     kill_pid(listener_process_pid);
+    kill_pid(cleaner_process_pid);
     // Cerrar tubería
     close(pipe_fd[0]);
     close(pipe_fd[1]);

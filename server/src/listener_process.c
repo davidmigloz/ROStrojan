@@ -16,10 +16,11 @@
  * Encargado recibir peticiones de conexión, desconexión y los datos de los clientes.
  * @param sem_id semaforo para la memoria compartida.
  * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @param socket_fd descriptor del socket.
  * @param max_num_clients número máximo de clientes.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int listener_process(int sem_id, char *shm_address, int max_num_clients) {
+int listener_process(int sem_id, char *shm_address, int socket_fd, int max_num_clients) {
     _Bool running = true;
     int end;
 
@@ -29,26 +30,15 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
         exit(EXIT_FAILURE);
     }
 
-    // Crear socket
-    int socket_fd;
+    // Configurar socket
     ssize_t bytes_read;
     struct sockaddr_in server_addr, client_addr;
     char buffer[BUFFER_SIZE];
-
-    if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-        perror("Error creating socket\n");
-        exit(EXIT_FAILURE);
-    }
 
     memset(&server_addr, 0, sizeof(server_addr)); // Set 0 the whole stucture
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    struct timeval read_timeout;
-    read_timeout.tv_sec = 0;
-    read_timeout.tv_usec = 50;
-    setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout, sizeof read_timeout);
 
     if (bind(socket_fd, (struct sockaddr *) &server_addr, sizeof(struct sockaddr)) == -1) {
         perror("Error linking socket\n");
@@ -58,11 +48,8 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
     // Bucle de ejecución
     while (running) {
         // Recibir datos
-        if ((bytes_read = recvfrom(socket_fd, buffer, BUFFER_SIZE, 0,
-                                   (struct sockaddr *) &client_addr, (socklen_t *) sizeof(client_addr))) == -1) {
-            perror("Error reciving data\n");
-            continue;
-        }
+        bytes_read = recvfrom(socket_fd, buffer, BUFFER_SIZE, 0,
+                              (struct sockaddr *) &client_addr, (socklen_t *) sizeof(client_addr));
 
         if (bytes_read > 0) {
             // Parsear datos
