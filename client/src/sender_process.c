@@ -11,15 +11,9 @@
 #include "sender_process.h"
 
 int sender_process() {
-    // Bloquear señales
-    if (bloq_signals()) {
-        perror("SEND: bloq_signals error\n");
-        exit(EXIT_FAILURE);
-    }
     int seconds = 60 * 5; // TODO read seconds from env
     int end;
     _Bool running = 1;
-    ssize_t written_bytes;
     // Para crear socket
     int socket_fd;
     char buffer[BUFFER_SIZE];
@@ -71,10 +65,13 @@ int sender_process() {
 
         // enviamos informacion con N reintentos
         for (int errors = 0; errors < NO_RETRIES; errors++) {
-            if (sendto(socket_fd, buffer, sizeof(buffer), 0, (struct sockaddr *) &remote_sock, sizeof(remote_sock))!=-1) {
+            if (sendto(socket_fd, buffer, sizeof(buffer), 0, (struct sockaddr *) &remote_sock, sizeof(remote_sock)) !=
+                -1) {
                 break;
             }
             perror("SEND: sendto error\n");
+            // Si falla la comunicacion le damos unos segundos para ver si se recupera
+            sleep(10);
         }
         // esperamos unos segundos
         int i = 0;
@@ -93,7 +90,6 @@ int sender_process() {
             i++;
         } while (i <= seconds);
     }
-
-
+    return EXIT_SUCCESS;
 }
 

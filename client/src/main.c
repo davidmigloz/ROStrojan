@@ -1,5 +1,10 @@
+#include "main_process.h"
+
+/**
+ * Entrada al programa, ejecuta el proceso principal.
+ */
 
 int main() {
-    return 0;
+    return main_process();
 }
 

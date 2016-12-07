@@ -277,5 +277,5 @@ void _show_info_client(int sem_id) {
     printf("  -USER:\t\t%s\n", info.user);
     printf("  -IP:\t\t\t%s\n", info.ip);
     printf("  -KERNEL:\t\t%s\n", info.kernel);
-    printf("  -LAST CONN:\t%i\n\n", info.last_conn);
+    printf("  -LAST CONN:\t%li\n\n", info.last_conn);
 }
