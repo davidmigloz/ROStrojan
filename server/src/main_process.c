@@ -92,8 +92,8 @@ int main_process() {
     // Cierre ordenado
     puts("Terminando ordenadamente...");
     // Terminar procesos hijo
-    kill_pid(listener_process_pid);
     kill_pid(cleaner_process_pid);
+    kill_pid(listener_process_pid);
     // Cerrar tubería
     close(pipe_fd[0]);
     close(pipe_fd[1]);

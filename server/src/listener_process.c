@@ -30,11 +30,12 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
     }
 
     // Crear socket
-    int sd;
+    int socket_fd;
+    ssize_t bytes_read;
     struct sockaddr_in server_addr, client_addr;
     char buffer[BUFFER_SIZE];
 
-    if ((sd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+    if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
         perror("Error creating socket\n");
         exit(EXIT_FAILURE);
     }
@@ -44,7 +45,12 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
     server_addr.sin_port = htons(PORT);
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    if (bind(sd, (struct sockaddr *) &server_addr, sizeof(struct sockaddr)) == -1) {
+    struct timeval read_timeout;
+    read_timeout.tv_sec = 0;
+    read_timeout.tv_usec = 50;
+    setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout, sizeof read_timeout);
+
+    if (bind(socket_fd, (struct sockaddr *) &server_addr, sizeof(struct sockaddr)) == -1) {
         perror("Error linking socket\n");
         exit(EXIT_FAILURE);
     }
@@ -52,20 +58,22 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
     // Bucle de ejecución
     while (running) {
         // Recibir datos
-        if (recvfrom(sd, buffer, BUFFER_SIZE, 0,
-                     (struct sockaddr *) &client_addr, (socklen_t *) sizeof(client_addr)) == -1) {
+        if ((bytes_read = recvfrom(socket_fd, buffer, BUFFER_SIZE, 0,
+                                   (struct sockaddr *) &client_addr, (socklen_t *) sizeof(client_addr))) == -1) {
             perror("Error reciving data\n");
             continue;
         }
 
-        // Parsear datos
-        client_info *client_info = (struct client_info *) ((void *) buffer);
+        if (bytes_read > 0) {
+            // Parsear datos
+            client_info *client_info = (struct client_info *) ((void *) buffer);
 
-        // Añadir info cliente
-        int ok = add_client_info(shm_address, client_info, max_num_clients, sem_id);
-        if (ok == EXIT_FAILURE) {
-            // Añadir info cliente de nuevo
-            add_client_info(shm_address, client_info, max_num_clients, sem_id);
+            // Añadir info cliente
+            int ok = add_client_info(shm_address, client_info, max_num_clients, sem_id);
+            if (ok == EXIT_FAILURE) {
+                // Añadir info cliente de nuevo
+                add_client_info(shm_address, client_info, max_num_clients, sem_id);
+            }
         }
 
         int i = 0;
@@ -86,6 +94,6 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
     }
 
     // Cerrar socket
-    close(sd);
+    close(socket_fd);
     return EXIT_SUCCESS;
 }
