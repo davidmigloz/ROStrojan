@@ -11,13 +11,14 @@
 #include "sender_process.h"
 
 int sender_process() {
-    int seconds = 60 * 5; // TODO read seconds from env
+    // Leemos el no de segundos de entorno
+    int seconds = atoi(get_var_value("client","seconds"));
     int end;
     _Bool running = 1;
     // Para crear socket
     int socket_fd;
     char buffer[BUFFER_SIZE];
-    struct sockaddr_in local_sock, remote_sock; // TODO read IP and port and Server Port from env -> REDO
+    struct sockaddr_in local_sock, remote_sock;
 
     // Creamos un socket
     if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
@@ -26,14 +27,10 @@ int sender_process() {
     }
     // Inicializamos local_sock
     memset(&local_sock, '0', sizeof(local_sock));
-    // TODO REDO
-    #define LOCALPORT 7654
-    #define REMOTEPORT 7654
 
     local_sock.sin_family = AF_INET;
     local_sock.sin_addr.s_addr = htonl(INADDR_ANY);
-    local_sock.sin_port = htons(LOCALPORT);
-    // TODO END REDO
+    local_sock.sin_port = htons((uint16_t)atoi(get_var_value("client","client_port")));
 
     // nos acoplamos al socket
     if (bind(socket_fd, (struct sockaddr *) &local_sock, sizeof(local_sock)) == -1) {
@@ -45,7 +42,8 @@ int sender_process() {
     memset(&remote_sock, '0', sizeof(remote_sock));
 
     remote_sock.sin_family = AF_INET;
-    remote_sock.sin_port = htons(REMOTEPORT);
+    remote_sock.sin_addr.s_addr = htonl((uint32_t)atoi(get_var_value("client","server_ip")));
+    remote_sock.sin_port = htons((uint16_t)atoi(get_var_value("client","server_port")));
 
     client_info client_inf;
     // TODO should be changed in server side (never trust the client)
