@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include <signal.h>
 #include "shm_utils.h"
-#include "sem_mng.h"
+#include "../../lib/sem_mng.h"
 #include "listener_process.h"
 #include "cleaner_process.h"
 #include "../../lib/env_mng.h"

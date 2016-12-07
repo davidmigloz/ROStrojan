@@ -36,15 +36,14 @@ char *shm_address;
 
 /**
  * Lógica del proceso principal.
- * Inicializa el segmento de memoria compartida y crea los procesos
- * hijo.
+ * Inicializa el segmento de memoria compartida y crea los procesos hijo.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
 int main_process() {
     // Leer número máximo de clientes
     int max_num_clients = _get_max_num_clients();
 
-    // Crear archivos temporales
+    // Crear archivos temporales (TMP_FILE_SHM y TMP_FILE_SEM)
     if (_create_tmp_dirs() == -1) {
         perror("create tmp dirs error\n");
         exit(EXIT_FAILURE);
@@ -53,18 +52,16 @@ int main_process() {
     // Crear semáforo
     int sem_id = create_sem();
 
-    // Crear segmento de memoria compartida y mapearlo al segmento de
-    // memoria la proceso
+    // Crear segmento de memoria compartida y mapearlo al segmento de memoria la proceso
     size_t shm_size = get_shm_size(max_num_clients);
     shm_address = create_shm(shm_size);
 
     // Crear tuberia unidireccional sin nombre
     int pipe_fd[2];
-    if(pipe(pipe_fd)==-1){
+    if (pipe(pipe_fd) == -1) {
         perror("Pipe error\n");
         exit(EXIT_FAILURE);
     }
-
 
     // Inicializar procesos hijo
     pid_t listener_process_pid, cleaner_process_pid;
@@ -82,7 +79,7 @@ int main_process() {
                     perror("fork error\n");
                     exit(EXIT_FAILURE);
                 case 0: // Child 2: cleaner process
-                    cleaner_process_exit = cleaner_process(pipe_fd, sem_id, shm_address, max_num_clients);
+                    cleaner_process_exit = cleaner_process(sem_id, shm_address, pipe_fd[0], max_num_clients);
                     exit(cleaner_process_exit);
                 default: // Parent
                     break;
@@ -94,12 +91,17 @@ int main_process() {
 
     // Cierre ordenado
     puts("Terminando ordenadamente...");
+    // Terminar procesos hijo
     kill_pid(listener_process_pid);
     kill_pid(cleaner_process_pid);
+    // Cerrar tubería
     close(pipe_fd[0]);
     close(pipe_fd[1]);
+    // Eliminar segmento de mem compartida
     detach_shm(shm_address);
+    // Eliminar semáforo
     delete_sem(sem_id);
+    // Eliminar directorios temporales
     _delete_tmp_dirs();
     return EXIT_SUCCESS;
 }
@@ -112,7 +114,6 @@ void _menu_loop(int pipe_fd[2], int sem_id) {
     _Bool running = true;
     int sel;
     int c;
-    char car = 'c';
     _print_menu();
 
     while (running) {
@@ -149,9 +150,8 @@ void _menu_loop(int pipe_fd[2], int sem_id) {
                 _print_menu();
                 break;
         }
-        // Cada vez que seleccionemos una opcion mandamos un caracter
-        // por la pipe
-        if(write(pipe_fd[1], &car, sizeof(car))==-1){
+        // Ordenar ejecución de limpieza
+        if (write(pipe_fd[1], &sel, sizeof(sel)) == -1) {
             perror("MAIN: write error\n");
             perror("Trying to continue\n");
         }

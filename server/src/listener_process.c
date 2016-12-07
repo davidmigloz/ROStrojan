@@ -30,37 +30,36 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
     }
 
     // Crear socket
-    struct sockaddr_in entrada, cliente;
-    int descriptor;
+    int sd;
+    struct sockaddr_in server_addr, client_addr;
     char buffer[BUFFER_SIZE];
 
-    if ((descriptor=socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+    if ((sd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
         perror("Error creating socket\n");
         exit(EXIT_FAILURE);
     }
 
-    memset((char *) &entrada, '0', sizeof(entrada));
-    entrada.sin_family = AF_INET;
-    entrada.sin_port = htons(PORT);
-    entrada.sin_addr.s_addr = htonl(INADDR_ANY); // TODO es necesario el htonl?
+    memset(&server_addr, 0, sizeof(server_addr)); // Set 0 the whole stucture
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    if( bind(descriptor , (struct sockaddr*)&entrada, sizeof(entrada) ) == -1) {
+    if (bind(sd, (struct sockaddr *) &server_addr, sizeof(struct sockaddr)) == -1) {
         perror("Error linking socket\n");
         exit(EXIT_FAILURE);
     }
 
+    // Bucle de ejecución
     while (running) {
         // Recibir datos
-        if (recvfrom(descriptor, buffer, BUFFER_SIZE, 0,
-                     (struct sockaddr *) &cliente, (socklen_t *) sizeof(cliente)) == -1) {
+        if (recvfrom(sd, buffer, BUFFER_SIZE, 0,
+                     (struct sockaddr *) &client_addr, (socklen_t *) sizeof(client_addr)) == -1) {
             perror("Error reciving data\n");
             continue;
         }
 
         // Parsear datos
         client_info *client_info = (struct client_info *) ((void *) buffer);
-
-
 
         // Añadir info cliente
         int ok = add_client_info(shm_address, client_info, max_num_clients, sem_id);
@@ -85,5 +84,8 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
             i++;
         } while (i <= DELAY);
     }
+
+    // Cerrar socket
+    close(sd);
     return EXIT_SUCCESS;
 }

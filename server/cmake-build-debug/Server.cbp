@@ -96,10 +96,28 @@
 		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/lib/file_mng.h">
 			<Option target="Server"/>
 		</Unit>
-		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/cleaning_process.c">
+		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/lib/sem_mng.c">
 			<Option target="Server"/>
 		</Unit>
-		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/cleaning_process.h">
+		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/lib/sem_mng.h">
+			<Option target="Server"/>
+		</Unit>
+		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/lib/shm_mng.c">
+			<Option target="Server"/>
+		</Unit>
+		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/lib/shm_mng.h">
+			<Option target="Server"/>
+		</Unit>
+		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/lib/sig_mng.c">
+			<Option target="Server"/>
+		</Unit>
+		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/lib/sig_mng.h">
+			<Option target="Server"/>
+		</Unit>
+		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/cleaner_process.c">
+			<Option target="Server"/>
+		</Unit>
+		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/cleaner_process.h">
 			<Option target="Server"/>
 		</Unit>
 		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/listener_process.c">
@@ -117,28 +135,10 @@
 		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/main_process.h">
 			<Option target="Server"/>
 		</Unit>
-		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/sem_mng.c">
-			<Option target="Server"/>
-		</Unit>
-		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/sem_mng.h">
-			<Option target="Server"/>
-		</Unit>
-		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/shm_mng.c">
-			<Option target="Server"/>
-		</Unit>
-		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/shm_mng.h">
-			<Option target="Server"/>
-		</Unit>
 		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/shm_utils.c">
 			<Option target="Server"/>
 		</Unit>
 		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/shm_utils.h">
-			<Option target="Server"/>
-		</Unit>
-		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/sig_mng.c">
-			<Option target="Server"/>
-		</Unit>
-		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/src/sig_mng.h">
 			<Option target="Server"/>
 		</Unit>
 		<Unit filename="/home/ddmlls/ClionProjects/ROStrojan/server/CMakeLists.txt">
