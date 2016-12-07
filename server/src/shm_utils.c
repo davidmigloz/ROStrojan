@@ -7,6 +7,7 @@
  * ****************************************************************************
  */
 
+#include <time.h>
 #include "shm_utils.h"
 
 // PRIVATE HEADERS
@@ -65,6 +66,8 @@ int add_client_info(char *shm_address, client_info *client_inf, int max_num_clie
     memory_client = (struct client_info *) (shm_address + get_shm_size(pos));
     *memory_client = *client_inf;
     memory_client->used = 1;
+    // TODO memory_client->id = ?;
+    memory_client->last_conn = time(NULL);
     // Incrementar num clientes
     ++(*shm_address);
     signal_sem(sem_id);

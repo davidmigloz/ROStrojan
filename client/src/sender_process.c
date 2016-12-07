@@ -7,24 +7,23 @@
  * ********************************************************************
  */
 
-#include <string.h>
+
 #include "sender_process.h"
 
 int sender_process() {
-    // TODO move signal (sig_mng.h) to libs
     // Bloquear señales
     if (bloq_signals()) {
         perror("SEND: bloq_signals error\n");
         exit(EXIT_FAILURE);
     }
-    int seconds = 60 * 5; // TODO read seconds from file
+    int seconds = 60 * 5; // TODO read seconds from env
     int end;
-    _Bool running = true;
+    _Bool running = 1;
     ssize_t written_bytes;
     // Para crear socket
     int socket_fd;
     char buffer[BUFFER_SIZE];
-    struct sockaddr_in local_sock, remote_sock; // TODO read IP and port and Server Port from file-> REDO
+    struct sockaddr_in local_sock, remote_sock; // TODO read IP and port and Server Port from env -> REDO
 
     // Creamos un socket
     if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
@@ -38,7 +37,7 @@ int sender_process() {
     #define REMOTEPORT 7654
 
     local_sock.sin_family = AF_INET;
-    local_sock.sin_addr.s_addr = INADDR_ANY; // TODO es necesario htonl?
+    local_sock.sin_addr.s_addr = htonl(INADDR_ANY);
     local_sock.sin_port = htons(LOCALPORT);
     // TODO END REDO
 
@@ -54,8 +53,21 @@ int sender_process() {
     remote_sock.sin_family = AF_INET;
     remote_sock.sin_port = htons(REMOTEPORT);
 
+    client_info client_inf;
+    // TODO should be changed in server side (never trust the client)
+    client_inf.used = 1;
+    client_inf.last_conn = 0;
+    client_inf.id = 0;
+    // TODO end should be changed in server side
+
+    client_inf.ip = ver_ip();// TODO make sure this works
+    client_inf.kernel = ver_kernel();
+    client_inf.name = ver_equipo();
+    client_inf.user = ver_usuario_actual();
+
+    strncpy(buffer, (char*)&client_inf, sizeof(client_inf));
+
     while (running) {
-        // TODO get information to send->BUFFER -> in struct client_info format.
 
         // enviamos informacion con N reintentos
         for (int errors = 0; errors < NO_RETRIES; errors++) {
@@ -73,7 +85,7 @@ int sender_process() {
                 perror("LIST: received_end error\n");
                 exit(EXIT_FAILURE);
             } else if (end == SIGNAL_RECEIVED) {
-                running = false;
+                running = 0;
                 break;
             }
             // Dormimos el proceso

@@ -60,6 +60,8 @@ int listener_process(int sem_id, char *shm_address, int max_num_clients) {
         // Parsear datos
         client_info *client_info = (struct client_info *) ((void *) buffer);
 
+
+
         // Añadir info cliente
         int ok = add_client_info(shm_address, client_info, max_num_clients, sem_id);
         if (ok == EXIT_FAILURE) {
