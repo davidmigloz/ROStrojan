@@ -15,7 +15,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include "shm_utils.h"
-#include "sem_mng.h"
+#include "../../lib/sem_mng.h"
 #include "../../lib/sig_mng.h"
 #include "../../lib/env_mng.h"
 
@@ -31,9 +31,10 @@
  * Lógica del proceso cleaner.
  * @param sem_id semaforo para la memoria compartida.
  * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @param read_pipe_fd descritor de letura de la tubería con el proceso padre.
  * @param max_num_clients número máximo de clientes.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int cleaner_process(int pipe_fd[2], int sem_id, char *shm_address, int max_num_clients);
+int cleaner_process(int sem_id, char *shm_address, int read_pipe_fd, int max_num_clients);
 
 #endif

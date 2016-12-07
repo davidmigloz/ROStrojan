@@ -21,10 +21,11 @@ int _clean(int sem_id, char *shm_address, int max_num_clients);
  * Lógica del proceso cleaner.
  * @param sem_id semaforo para la memoria compartida.
  * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @param read_pipe_fd descritor de letura de la tubería con el proceso padre.
  * @param max_num_clients número máximo de clientes.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
-int cleaner_process(int pipe_fd[2], int sem_id, char *shm_address, int max_num_clients) {
+int cleaner_process(int sem_id, char *shm_address, int read_pipe_fd, int max_num_clients) {
     int end;
     _Bool running = true;
     ssize_t read_bytes;
@@ -37,12 +38,12 @@ int cleaner_process(int pipe_fd[2], int sem_id, char *shm_address, int max_num_c
     }
 
     while (running) {
-        // Leemos de la pipe
-        if((read_bytes = read(pipe_fd[0], &pipe_b, sizeof(pipe_b)))==-1){
+        // Leemos de la tubería
+        if((read_bytes = read(read_pipe_fd, &pipe_b, sizeof(pipe_b)))==-1){
             perror("CLE: read error\n");
             exit(EXIT_FAILURE);
         }else if(read_bytes>0){
-            // No nos interesa el que leemos solo si leemos algo
+            // Si se ha recibido alguna orden -> ejecutar limpieza
             _clean(sem_id, shm_address, max_num_clients);
         }
 
@@ -62,13 +63,11 @@ int cleaner_process(int pipe_fd[2], int sem_id, char *shm_address, int max_num_c
             i++;
         } while (i <= DELAY);
     }
-    // Cerramos la tuberia; podriamos haber cerrado pipe_fd[1] al principio
-    close(pipe_fd[0]);
-    close(pipe_fd[1]);
+    // Cerramos la tubería
+    close(read_pipe_fd);
 
     return EXIT_SUCCESS;
 }
-
 
 int _clean(int sem_id, char *shm_address, int max_num_clients) {
     // Obtener antigüedad máxima

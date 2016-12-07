@@ -12,10 +12,6 @@ set(SOURCE_FILES
         src/listener_process.h
         src/cleaner_process.c
         src/cleaner_process.h
-        src/shm_mng.c
-        src/shm_mng.h
-        src/sem_mng.c
-        src/sem_mng.h
         src/shm_utils.c
         src/shm_utils.h)
 
@@ -26,6 +22,10 @@ set(LIB_FILES
         ../lib/env_mng.h
         ../lib/sig_mng.c
         ../lib/sig_mng.h
+        ../lib/shm_mng.c
+        ../lib/shm_mng.h
+        ../lib/sem_mng.c
+        ../lib/sem_mng.h
         )
 
 add_executable(Server ${SOURCE_FILES} ${LIB_FILES})

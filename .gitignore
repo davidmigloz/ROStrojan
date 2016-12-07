@@ -1,8 +1,9 @@
 
 # Created by https://www.gitignore.io/api/c,jetbrains,cmake
 
-/bin
+bin/
 entorno.dat
+cmake-build-debug/
 
 ### C ###
 # Prerequisites

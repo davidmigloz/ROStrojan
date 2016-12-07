@@ -11,8 +11,10 @@
 #define SERVER_SHM_UTILS_H
 
 // INCLUDES
-#include "sem_mng.h"
-#include "shm_mng.h"
+#include "../../lib/sem_mng.h"
+#include "../../lib/shm_mng.h"
+#include <time.h>
+#include <string.h>
 
 // DEFINES
 #define NAMES_MAXLENGHT 100
