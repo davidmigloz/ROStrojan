@@ -6,9 +6,11 @@
  * Encargado de enviar datos de cliente hasta el servidor.
  * ********************************************************************
  */
-
-
 #include "sender_process.h"
+
+
+int socket_fd;
+
 
 int sender_process() {
     // Leemos el no de segundos de entorno
@@ -16,7 +18,6 @@ int sender_process() {
     int end;
     _Bool running = 1;
     // Para crear socket
-    int socket_fd;
     char buffer[BUFFER_SIZE];
     struct sockaddr_in local_sock, remote_sock;
 
@@ -90,4 +91,9 @@ int sender_process() {
     }
     return EXIT_SUCCESS;
 }
+
+void _close_socket(){
+    shutdown(socket_fd, SHUT_RDWR);
+}
+
 
