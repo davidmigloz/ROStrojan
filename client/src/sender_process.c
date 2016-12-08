@@ -60,7 +60,7 @@ int sender_process() {
         for (int errors = 0; errors < NO_RETRIES; errors++) {
             if (sendto(socket_fd, buffer, BUFFER_SIZE, 0, (struct sockaddr *) &server_addr,
                        sizeof(struct sockaddr)) != -1) {
-                puts("Informacion enviada!\n");
+                puts("Informacion enviada!");
                 break;
             }
             perror("Error while sending data.\n");
@@ -68,7 +68,7 @@ int sender_process() {
                 puts("Retrying...\n");
                 sleep(10);
             } else {
-                puts("Error alcanzado maximo numero de reintentos\nCerrando...\n");
+                puts("Error alcanzado maximo numero de reintentos\nCerrando...");
                 exit(EXIT_FAILURE);
             }
         }
