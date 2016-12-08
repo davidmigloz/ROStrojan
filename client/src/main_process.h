@@ -14,12 +14,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
-
 #include "sender_process.h"
-
 
 // PROTOTYPES
 int main_process();
 
-#endif //CLIENT_MAIN_PROCESS_H
+#endif

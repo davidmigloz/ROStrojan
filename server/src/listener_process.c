@@ -35,7 +35,7 @@ int listener_process(int sem_id, char *shm_address, int socket_fd, int max_num_c
     struct sockaddr_in server_addr, client_addr;
     char buffer[BUFFER_SIZE];
 
-    memset(&server_addr, 0, sizeof(server_addr)); // Set 0 the whole stucture
+    memset(&server_addr, 0, sizeof(server_addr)); // Establecer a 0 the toda la estructura
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);

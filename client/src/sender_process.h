@@ -12,6 +12,7 @@
 // INCLUDES
 #include <netinet/in.h>
 #include <string.h>
+#include <stdbool.h>
 #include "../../lib/file_mng.h"
 #include "../../lib/system_info.h"
 #include "../../lib/env_mng.h"
@@ -35,6 +36,12 @@ struct client_info {
 };
 
 // PROTOTYPES
+
+/**
+ * Lógica del proceso sender.
+ * Encargado enviar los datos del cliente al servidor.
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
+ */
 int sender_process();
 
-#endif //CLIENT_SENDER_H
+#endif

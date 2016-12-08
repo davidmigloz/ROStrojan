@@ -8,6 +8,8 @@
  */
 #include "main_process.h"
 
+// PRIVATE HEADERS
+
 int _menu_loop();
 
 void _print_end();
@@ -16,7 +18,7 @@ int user_exit = 0;
 
 /**
  * Proceso principal.
- * @return
+ * @return EXIT_SUCCESS o EXIT_FAILURE.
  */
 int main_process() {
     // Inicializar hijo
@@ -31,9 +33,11 @@ int main_process() {
         default:
             break;
     }
-    // Prepararnos por si el hijo hace n intentos sin exito
+
+    // Prepararnos por si el hijo hace n intentos sin éxito
     atexit(_print_end);
-    // Ir al menu
+
+    // Ir al menú
     _menu_loop();
 
     // Cierre ordenado
@@ -42,8 +46,8 @@ int main_process() {
 }
 
 /**
- * Menu de la aplicacion que determina cuanto tiempo se ejecuta
- * @return EXIT_SUCCESS
+ * Menu de la aplicacion que determina cuánto tiempo se ejecuta.
+ * @return EXIT_SUCCESS.
  */
 int _menu_loop() {
     _Bool running = true;
@@ -67,12 +71,12 @@ int _menu_loop() {
 
 
 /**
- * Dar aviso al usuario de cierre
+ * Dar aviso al usuario del cierre.
  */
 void _print_end() {
     if (user_exit) {
-        printf("Timeout: no se ha podido comunicar con el servidor en demasiado tiempo\n");
+        printf("Timeout: no se ha podido comunicar con el servidor en demasiado tiempo.\n");
     } else {
-        printf("Cerrando\n");
+        printf("Cerrando...\n");
     }
 }
