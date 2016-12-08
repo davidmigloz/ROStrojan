@@ -1,11 +1,12 @@
 /*
- * ****************************************************************************
+ * ********************************************************************
  * main_process.c
  *
  * Logíca del proceso principal.
  * Encargado de la inicialización los recursos necesarios (procesos,
- * estructuras...), del menejo del menú y del cierre ordenado de los procesos.
- * ****************************************************************************
+ * estructuras...), del menejo del menú y del cierre ordenado de los
+ * procesos.
+ * ********************************************************************
  */
 
 #include "main_process.h"
@@ -18,7 +19,7 @@ int _create_tmp_dirs();
 
 int _delete_tmp_dirs();
 
-void _menu_loop(int sem_id);
+void _menu_loop(int pipe_fd[2], int sem_id);
 
 void _print_menu();
 
@@ -42,7 +43,7 @@ int main_process() {
     // Leer número máximo de clientes
     int max_num_clients = _get_max_num_clients();
 
-    // Crear archivos temporales
+    // Crear archivos temporales (TMP_FILE_SHM y TMP_FILE_SEM)
     if (_create_tmp_dirs() == -1) {
         perror("create tmp dirs error\n");
         exit(EXIT_FAILURE);
@@ -55,28 +56,61 @@ int main_process() {
     size_t shm_size = get_shm_size(max_num_clients);
     shm_address = create_shm(shm_size);
 
+    // Crear tuberia unidireccional sin nombre
+    int pipe_fd[2];
+    if (pipe(pipe_fd) == -1) {
+        perror("Pipe error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Crear socket
+    int socket_fd;
+    if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+        perror("Error creating socket\n");
+        exit(EXIT_FAILURE);
+    }
+
     // Inicializar procesos hijo
-    pid_t child_pid;
-    int listener_process_exit;
-    switch (child_pid = fork()) {
+    pid_t listener_process_pid, cleaner_process_pid;
+    int listener_process_exit, cleaner_process_exit;
+    switch (listener_process_pid = fork()) { // Create listener process
         case -1: // Error
             perror("fork error\n");
             exit(EXIT_FAILURE);
         case 0: // Child 1: listener process
-            listener_process_exit = listener_process(sem_id, shm_address, max_num_clients);
+            listener_process_exit = listener_process(sem_id, shm_address, socket_fd, max_num_clients);
             exit(listener_process_exit);
         default: // Parent
-            break;
+            switch (cleaner_process_pid = fork()) { // Create cleaner process
+                case -1: // Error
+                    perror("fork error\n");
+                    exit(EXIT_FAILURE);
+                case 0: // Child 2: cleaner process
+                    cleaner_process_exit = cleaner_process(sem_id, shm_address, pipe_fd[0], max_num_clients);
+                    exit(cleaner_process_exit);
+                default: // Parent
+                    break;
+            }
     }
 
     // Escuchar órdenes de usuario
-    _menu_loop(sem_id);
+    _menu_loop(pipe_fd, sem_id);
 
     // Cierre ordenado
     puts("Terminando ordenadamente...");
-    kill_pid(child_pid);
+    // Cerrar socket
+    shutdown(socket_fd, SHUT_RD);
+    // Terminar procesos hijo
+    kill_pid(listener_process_pid);
+    kill_pid(cleaner_process_pid);
+    // Cerrar tubería
+    close(pipe_fd[0]);
+    close(pipe_fd[1]);
+    // Eliminar segmento de mem compartida
     detach_shm(shm_address);
+    // Eliminar semáforo
     delete_sem(sem_id);
+    // Eliminar directorios temporales
     _delete_tmp_dirs();
     return EXIT_SUCCESS;
 }
@@ -85,7 +119,7 @@ int main_process() {
  * Bucle del menú de usuario.
  * El bucle termina cuando se selecciona la opción de cerrar.
  */
-void _menu_loop(int sem_id) {
+void _menu_loop(int pipe_fd[2], int sem_id) {
     _Bool running = true;
     int sel;
     int c;
@@ -93,7 +127,7 @@ void _menu_loop(int sem_id) {
 
     while (running) {
         printf("_____________________________________________\n");
-        printf("Seleccione una opción [1-5]: ");
+        printf("Seleccione una opción [1-5]:\n");
 
         // Leer opción introducida
         sel = -1;
@@ -124,6 +158,11 @@ void _menu_loop(int sem_id) {
                 printf(" Selección inválida!!!\n");
                 _print_menu();
                 break;
+        }
+        // Ordenar ejecución de limpieza
+        if (write(pipe_fd[1], &sel, sizeof(sel)) == -1) {
+            perror("MAIN: write error\n");
+            perror("Trying to continue\n");
         }
     }
 }
@@ -240,12 +279,14 @@ void _show_info_client(int sem_id) {
         printf("El índice no se encuentra en uso.\n\n");
         return;
     }
+    // Format last conn
+    char time[20];
+    strftime(time, 20, "%d/%m/%Y %H:%M:%S", localtime(&info.last_conn));
     // Mostrar info
     printf("> Información del cliente:\n");
-    printf("  -ID:\t\t\t%d\n", info.id);
     printf("  -NAME:\t\t%s\n", info.name);
     printf("  -USER:\t\t%s\n", info.user);
     printf("  -IP:\t\t\t%s\n", info.ip);
     printf("  -KERNEL:\t\t%s\n", info.kernel);
-    printf("  -LAST CONN:\t%i\n\n", info.last_conn);
+    printf("  -LAST CONN:\t%s\n\n", time);
 }

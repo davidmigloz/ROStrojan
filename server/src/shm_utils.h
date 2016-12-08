@@ -11,8 +11,11 @@
 #define SERVER_SHM_UTILS_H
 
 // INCLUDES
-#include "sem_mng.h"
-#include "shm_mng.h"
+#include "../../lib/sem_mng.h"
+#include "../../lib/shm_mng.h"
+#include <time.h>
+#include <string.h>
+#include <stdbool.h>
 
 // DEFINES
 #define NAMES_MAXLENGHT 100
@@ -21,8 +24,7 @@
 typedef struct client_info client_info;
 struct client_info {
     _Bool used;
-    int id;
-    int last_conn;
+    time_t last_conn;
     char name[NAMES_MAXLENGHT + 1];
     char user[NAMES_MAXLENGHT + 1];
     char ip[NAMES_MAXLENGHT + 1];
@@ -64,6 +66,17 @@ int add_client_info(char *shm_address, client_info *client_inf, int max_num_clie
  * @return EXIT_SUCCESS.
  */
 int delete_client_info(char *shm_address, int n, int sem_id);
+
+/**
+ * Recorre los registros almacenados liberando aquellos con una antiguedad mayor que
+ * la indicadaa.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @param max_timestamp máxima antiguedad.
+ * @param max_num_clients número máximo de clientes.
+ * @param sem_id semaforo para la memoria compartida.
+ * @return
+ */
+int clean_old_records(char *shm_address, long max_timestamp, int max_num_clients, int sem_id);
 
 /**
  * Devuelve el tamaño que tiene que tener el segmento de memoria compartida para almacenar información el número
