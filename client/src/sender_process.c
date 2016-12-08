@@ -38,8 +38,10 @@ int sender_process() {
         perror("SEND: bind error\n");
         exit(EXIT_FAILURE);
     }
-
-    // Inicializamos remote_sock
+	
+	atexit(_close_socket);
+	
+	// Inicializamos remote_sock
     memset(&remote_sock, '0', sizeof(remote_sock));
 
     remote_sock.sin_family = AF_INET;

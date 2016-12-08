@@ -1,6 +1,11 @@
-
-
-#include <stdbool.h>
+/**
+ * ********************************************************************
+ * main_process.c
+ *
+ * Lógica del cliente, su menu y la invocación de su hijo que controla 
+ * la red.
+ * ********************************************************************
+ */
 #include "main_process.h"
 
 int _menu_loop();
