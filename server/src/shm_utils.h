@@ -15,6 +15,7 @@
 #include "../../lib/shm_mng.h"
 #include <time.h>
 #include <string.h>
+#include <stdbool.h>
 
 // DEFINES
 #define NAMES_MAXLENGHT 100
@@ -23,7 +24,6 @@
 typedef struct client_info client_info;
 struct client_info {
     _Bool used;
-    int id;
     time_t last_conn;
     char name[NAMES_MAXLENGHT + 1];
     char user[NAMES_MAXLENGHT + 1];

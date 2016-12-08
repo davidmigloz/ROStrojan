@@ -14,8 +14,6 @@ int _menu_loop();
 
 void _print_end();
 
-int user_exit = 0;
-
 /**
  * Proceso principal.
  * @return EXIT_SUCCESS o EXIT_FAILURE.
@@ -54,12 +52,16 @@ int _menu_loop() {
     int selection = 0;
 
     while (running) {
-        printf("Menu (elige de las opciones):");
-        printf("0 - Salir del programa.");
+        printf("=============================================\n");
+        printf("                   M E N Ú                   \n");
+        printf("=============================================\n");
+        printf("> 0: Cerrar                                  \n");
+        printf("_____________________________________________\n");
+        printf("Seleccione una opción [1-5]:\n");
+
         scanf("%d", &selection);
         switch (selection) {
             case 0:
-                user_exit = 1;
                 running = false;
                 break;
             default:
@@ -74,9 +76,5 @@ int _menu_loop() {
  * Dar aviso al usuario del cierre.
  */
 void _print_end() {
-    if (user_exit) {
-        printf("Timeout: no se ha podido comunicar con el servidor en demasiado tiempo.\n");
-    } else {
-        printf("Cerrando...\n");
-    }
+    printf("Cerrando...\n");
 }

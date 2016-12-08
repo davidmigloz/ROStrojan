@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <stdbool.h>
+#include <netdb.h>
 #include "../../lib/file_mng.h"
 #include "../../lib/system_info.h"
 #include "../../lib/env_mng.h"

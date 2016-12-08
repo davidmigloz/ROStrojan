@@ -13,6 +13,8 @@
 
 int _search_empty_pos(char *shm_address, int max_num_clients);
 
+int _search_client_pos(char *shm_address, client_info *new_client_info, int max_num_clients);
+
 /**
  * Devuelve el número de clientes conectados.
  * @param shm_address dirección virtual del segmento de memoria compartida.
@@ -52,23 +54,31 @@ client_info get_client_info(char *shm_address, int n, int sem_id) {
  */
 int add_client_info(char *shm_address, client_info *client_inf, int max_num_clients, int sem_id) {
     int pos;
+    _Bool new = false;
     client_info *memory_client;
     wait_sem(sem_id);
-    // Comprobar que hay posición libre
-    if (max_num_clients - ((int) *shm_address) == 0) {
-        signal_sem(sem_id);
-        return EXIT_FAILURE;
+    // Comprobar si ya existe el cliente
+    pos = _search_client_pos(shm_address, client_inf, max_num_clients);
+    // Si existe actualizar los datos, si no, añadir en posición libre
+    if(pos == -1) {
+        // Comprobar que hay posición libre
+        if (max_num_clients - ((int) *shm_address) == 0) {
+            signal_sem(sem_id);
+            return EXIT_FAILURE;
+        }
+        // Buscar posición libre
+        pos = _search_empty_pos(shm_address, max_num_clients);
+        new = true;
     }
-    // Buscar posición libre
-    pos = _search_empty_pos(shm_address, max_num_clients);
     // Rellenar info
     memory_client = (struct client_info *) (shm_address + get_shm_size(pos));
     *memory_client = *client_inf;
     memory_client->used = 1;
-    // TODO memory_client->id = ?;
-    memory_client->last_conn = time(NULL);
+    memory_client->last_conn = time(0);
     // Incrementar num clientes
-    ++(*shm_address);
+    if(new) {
+        ++(*shm_address);
+    }
     signal_sem(sem_id);
     return EXIT_SUCCESS;
 }
@@ -79,7 +89,7 @@ int add_client_info(char *shm_address, client_info *client_inf, int max_num_clie
  * El semaforo lo tiene que poseer el proceso que llame a la función.
  * @param shm_address dirección virtual del segmento de memoria compartida.
  * @param max_num_clients número máximo de clientes.
- * @return n posicion libre en memoria
+ * @return n posicion libre en memoria.
  */
 int _search_empty_pos(char *shm_address, int max_num_clients) {
     int i;
@@ -88,6 +98,28 @@ int _search_empty_pos(char *shm_address, int max_num_clients) {
     client_info = (struct client_info *) ((void *) shm_address + sizeof(int));
     for (i = 0; i < max_num_clients; ++i) {
         if (client_info[i].used == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/**
+ * Busca el cliente pasado en todos los registros. Si existe, devuelve su posición.
+ * Si no, devuelve -1.
+ * El semaforo lo tiene que poseer el proceso que llame a la función.
+ * @param shm_address dirección virtual del segmento de memoria compartida.
+ * @param client_info información del cliente.
+ * @param max_num_clients número máximo de clientes.
+ * @return posición del cliente o -1.
+ */
+int _search_client_pos(char *shm_address, client_info *new_client_info, int max_num_clients) {
+    int i;
+    struct client_info *client_info;
+    // Buscar posición libre
+    client_info = (struct client_info *) ((void *) shm_address + sizeof(int));
+    for (i = 0; i < max_num_clients; ++i) {
+        if (!strcmp(client_info[i].ip, new_client_info->ip)) {
             return i;
         }
     }

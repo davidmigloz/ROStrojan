@@ -21,5 +21,5 @@ set(LIB_FILES
         ../lib/sig_mng.c
         ../lib/sig_mng.h
         )
-    
-add_executable(Server ${SOURCE_FILES} ${LIB_FILES})
+
+add_executable(Client ${SOURCE_FILES} ${LIB_FILES})

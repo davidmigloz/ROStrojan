@@ -127,7 +127,7 @@ void _menu_loop(int pipe_fd[2], int sem_id) {
 
     while (running) {
         printf("_____________________________________________\n");
-        printf("Seleccione una opción [1-5]: ");
+        printf("Seleccione una opción [1-5]:\n");
 
         // Leer opción introducida
         sel = -1;
@@ -279,12 +279,14 @@ void _show_info_client(int sem_id) {
         printf("El índice no se encuentra en uso.\n\n");
         return;
     }
+    // Format last conn
+    char time[20];
+    strftime(time, 20, "%d/%m/%Y %H:%M:%S", localtime(&info.last_conn));
     // Mostrar info
     printf("> Información del cliente:\n");
-    printf("  -ID:\t\t\t%d\n", info.id);
     printf("  -NAME:\t\t%s\n", info.name);
     printf("  -USER:\t\t%s\n", info.user);
     printf("  -IP:\t\t\t%s\n", info.ip);
     printf("  -KERNEL:\t\t%s\n", info.kernel);
-    printf("  -LAST CONN:\t%li\n\n", info.last_conn);
+    printf("  -LAST CONN:\t%s\n\n", time);
 }
