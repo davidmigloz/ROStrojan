@@ -23,7 +23,7 @@ int main_process() {
     pid_t sender_pid;
     switch (sender_pid = fork()) {
         case -1:
-            perror("MAIN: fork error");
+            perror("MAIN: fork error\n");
             _exit(EXIT_FAILURE);
         case 0:
             sender_process();
@@ -57,7 +57,7 @@ int _menu_loop() {
         printf("=============================================\n");
         printf("> 0: Cerrar                                  \n");
         printf("_____________________________________________\n");
-        printf("Seleccione una opción [1-5]:\n");
+        printf("Seleccione una opción [0]:\n");
 
         scanf("%d", &selection);
         switch (selection) {
